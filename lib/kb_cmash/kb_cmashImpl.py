@@ -4,6 +4,7 @@ import os
 import subprocess
 from installed_clients.KBaseReportClient import KBaseReport
 from .utils.CMashUtils import CMashUtils
+from .utils.misc_utils import load_fasta
 
 #END_HEADER
 
@@ -53,13 +54,14 @@ class kb_cmash:
         # return variables are: output
         #BEGIN run_kb_cmash
         ref = params['ref']
-        db  = os.path.join("utils/data",params['db'])
+        curr_dir =  os.path.dirname(os.path.realpath(__file__))
+        db  = os.path.join(curr_dir, "utils/data", params['db'])
         # get fasta file from input reference
-        fasta_path = load_fasta(ref)
+        fasta_path = load_fasta(self.callback_url, self.shared_folder, ref)
         # form reference database
         fasta_dir = []
 
-        cmu = CMashUtils(self.cfg, params['workspace_name'])
+        cmu = CMashUtils(self.cfg, self.callback_url, params['workspace_name'])
         # db = cmu.build_db(fasta_dir)
         # db = "utils/data/soil_test_4_samples.h5"
         output_csv = cmu.query_db(db, fasta_path)

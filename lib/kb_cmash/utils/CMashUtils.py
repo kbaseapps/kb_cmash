@@ -16,9 +16,9 @@ class CMashUtils():
     '''
     Utilities for CMash
     '''
-    def __init__(self, config, workspace_name):
+    def __init__(self, config, callback_url, workspace_name):
         self.shared_folder = config['scratch']
-        self.callback_url  = config['SDK_CALLBACK_URL']
+        self.callback_url  = callback_url
         self.cmash_scripts = '/opt/CMash/scripts/'
         self.workspace_name = workspace_name
 
@@ -49,17 +49,21 @@ class CMashUtils():
 
         return output
 
-    def _process_output(output_df):
+    def _process_output(self, output_df):
         '''
         '''
         return [output_df.to_dict()]
 
-    def _output_to_html(output_csv, html_file):
+    def _output_to_html(self, output_csv, html_file):
         '''
         '''
-        formatted_csv = _process_output(pd.read_csv(output_csv))
+        html_path = os.path.join(self.shared_folder, html_file)
+        formatted_csv = self._process_output(pd.read_csv(output_csv))
         template = env.get_template(html_file)
-        return template.render(results=formatted_csv)
+        rendered_html = template.render(results=formatted_csv)
+        with open(html_path, 'w') as f:
+            f.write(rendered_html)
+        return html_path
 
     def get_report(self, output_csv):
         '''
@@ -67,7 +71,7 @@ class CMashUtils():
         report_client = KBaseReport(self.callback_url)
         report_name = 'kb_cmash_'+str(uuid.uuid4())
 
-        html_file = _output_to_html(output_csv, 'output_csv.html')
+        html_file = self._output_to_html(output_csv, 'output_csv.html')
         html_link = {
             'path': html_file,
             'name': 'output_csv.html',

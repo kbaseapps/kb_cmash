@@ -4,11 +4,11 @@ A KBase module: kb_cmash
 
 module kb_cmash {
 
-    typedef stucture {
+    typedef structure {
         string workspace_name;
         string ref;
         string db;
-    } kb_cmash_params
+    } kb_cmash_params;
 
     typedef structure {
         string report_name;

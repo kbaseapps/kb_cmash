@@ -8,14 +8,15 @@ MAINTAINER KBase Developer
 
 # RUN apt-get update
 # install CMash scripts
-RUN apt-get update &&\
-	apt-get upgrade &&\
-	apt-get install git &&\
-	apt-get install gcc &&\
-	apt-get install g++ &&\
+RUN apt-get -y update &&\
+	apt-get -y upgrade &&\
+	apt-get -y install git &&\
+	apt-get -y install gcc &&\
+	apt-get -y install g++ &&\
     cd /opt &&\
     git clone https://github.com/dkoslicki/CMash.git &&\
     cd CMash &&\
+    pip install --upgrade pip && \
     pip install -r requirements.txt
 
 

@@ -78,5 +78,6 @@ class kb_cmashTest(unittest.TestCase):
         #
         # Check returned data with
         # self.assertEqual(ret[...], ...) or other unittest methods
-        ret = self.getImpl().run_kb_cmash(self.getContext(), {'workspace_name': self.getWsName(),
-                                                                    'parameter_1': 'Hello World!'})
+        ref = "22385/47/1"
+
+        ret = self.getImpl().run_kb_cmash(self.getContext(), {'workspace_name': self.getWsName(), 'ref': ref, 'db':'soil_test_4_samples.h5'})
