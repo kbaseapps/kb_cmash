@@ -1,6 +1,18 @@
 [ {
+  "module_name" : "AssemblyUtil",
+  "type" : "sdk",
+  "version_tag" : "release"
+}, {
+  "module_name" : "DataFileUtil",
+  "type" : "sdk",
+  "version_tag" : "release"
+}, {
   "module_name" : "KBaseReport",
   "type" : "core"
+}, {
+  "module_name" : "ReadsUtils",
+  "type" : "sdk",
+  "version_tag" : "release"
 }, {
   "module_name" : "Workspace",
   "type" : "core",

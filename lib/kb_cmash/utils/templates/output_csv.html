@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+	<link>
+	<title>  </title>
+</head>
+<body>
+	<h1> File Similarity </h1>
+File name,intersection,containment index,jaccard index
+	<table>
+		<tbody>
+			{% for item in results %}
+			<tr>
+			    <td>File Name</td>
+			    <td>{{item.file_name}}</td>
+			</tr>
+			<tr>
+			    <td>Intersection</td>
+				<td>{{item.intersection}}</td>
+			</tr>
+			<tr>
+			    <td>Containment Index</td>
+			    <td>{{item.containment}}</td>
+			</tr>
+			<tr>
+			    <td>Jaccard Index</td>
+			    <td>{{item.jaccard}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</body>
+</html>

@@ -9,16 +9,30 @@
         "input": null,
         "output": null
     },
-    "parameters": [ 
+    "parameters": [
         {
-            "id": "parameter_1",
-            "optional": true,
+            "id": "ref",
+            "optional": false,
             "advanced": false,
             "allow_multiple": false,
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ ]
+                "valid_ws_types": ["KBaseGenomes.ContigSet","KBaseGenomeAnnotations.Assembly"]
+            }
+        },
+        {
+            "id": "db",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "dropdown",
+            "dropdown_options": {
+                "options": [{
+                    "value": "soil_test_4_samples.h5",
+                    "display": "Soil Test"
+                }]
             }
         }
     ],
@@ -35,8 +49,11 @@
                     "narrative_system_variable": "workspace_id",
                     "target_property": "workspace_id"
                 },{
-                    "input_parameter": "parameter_1",
-                    "target_property": "parameter_1"
+                    "input_parameter": "ref",
+                    "target_property": "ref"
+                },{
+                    "input_parameter": "db",
+                    "target_property": "db"
                 }
             ],
             "output_mapping": [

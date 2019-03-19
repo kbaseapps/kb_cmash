@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
 import os
+import subprocess
 from installed_clients.KBaseReportClient import KBaseReport
+from .utils.CMashUtils import CMashUtils
+
 #END_HEADER
 
+cmash_scripts = '/opt/CMash/CMash/scripts/'
 
 class kb_cmash:
     '''
@@ -33,6 +37,7 @@ class kb_cmash:
         #BEGIN_CONSTRUCTOR
         self.callback_url = os.environ['SDK_CALLBACK_URL']
         self.shared_folder = config['scratch']
+        self.cfg = config
         #END_CONSTRUCTOR
         pass
 
@@ -47,14 +52,19 @@ class kb_cmash:
         # ctx is the context object
         # return variables are: output
         #BEGIN run_kb_cmash
-        report = KBaseReport(self.callback_url)
-        report_info = report.create({'report': {'objects_created':[],
-                                                'text_message': params['parameter_1']},
-                                                'workspace_name': params['workspace_name']})
-        output = {
-            'report_name': report_info['name'],
-            'report_ref': report_info['ref'],
-        }
+        ref = params['ref']
+        db  = os.path.join("utils/data",params['db'])
+        # get fasta file from input reference
+        fasta_path = load_fasta(ref)
+        # form reference database
+        fasta_dir = []
+
+        cmu = CMashUtils(self.cfg, params['workspace_name'])
+        # db = cmu.build_db(fasta_dir)
+        # db = "utils/data/soil_test_4_samples.h5"
+        output_csv = cmu.query_db(db, fasta_path)
+        output = cmu.get_report(output_csv)
+
         #END run_kb_cmash
 
         # At some point might do deeper type checking...
