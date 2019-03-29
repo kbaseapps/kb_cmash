@@ -64,7 +64,8 @@
                     "target_property": "workspace_id"
                 },{
                     "input_parameter": "ref",
-                    "target_property": "ref"
+                    "target_property": "ref",
+                    "target_type_transform":"ref"
                 },{
                     "input_parameter": "db",
                     "target_property": "db"
