@@ -8,6 +8,9 @@ from kb_cmash.kb_cmashImpl import kb_cmash
 from kb_cmash.kb_cmashServer import MethodContext
 from kb_cmash.authclient import KBaseAuth as _KBaseAuth
 
+from kb_cmash.utils.CMashUtils import CMashUtils
+from kb_cmash.utils.ui_utils import format_results
+
 from installed_clients.WorkspaceClient import Workspace
 
 
@@ -67,6 +70,32 @@ class kb_cmashTest(unittest.TestCase):
     def getContext(self):
         return self.__class__.ctx
 
+    def test_genome_set_input(self):
+        """
+        test genome set as input
+        """
+        gs_ref = "23594/20/1"
+        db = "100_metagenomes_testdb.h5"
+
+        ret = self.getImpl().run_kb_cmash(self.getContext(), {
+            'workspace_name': self.getWsName(),
+            'ref': gs_ref,
+            'n_max_results': 10,
+            'db':db
+        })
+
+
+    def test_from_files(self):
+        '''
+        test on local file
+        '''
+        fasta_path = "data/MGYA00237725_ERZ505430_FASTA.fa"
+        db = "data/100_metagenomes_testdb.h5"
+
+        cmu = CMashUtils(self.__class__.cfg, self.wsURL, self.callback_url)
+        results = cmu.query_db(db, [(fasta_path, '0/0/0')])
+        stats, upa_names, tree, markers = format_results(self.wsURL, self.callback_url, results, is_test=True)
+
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     def test_your_method(self):
         # Prepare test objects in workspace if needed using
@@ -79,5 +108,11 @@ class kb_cmashTest(unittest.TestCase):
         # Check returned data with
         # self.assertEqual(ret[...], ...) or other unittest methods
         ref = "22385/47/1"
+        db = "100_metagenomes_testdb.h5"
 
-        ret = self.getImpl().run_kb_cmash(self.getContext(), {'workspace_name': self.getWsName(), 'ref': ref, 'db':'soil_test_4_samples.h5'})
+        ret = self.getImpl().run_kb_cmash(self.getContext(), {
+            'workspace_name': self.getWsName(),
+            'ref': ref,
+            'n_max_results': 10,
+            'db':db
+        })

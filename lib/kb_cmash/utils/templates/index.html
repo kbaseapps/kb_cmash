@@ -1,0 +1,1065 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4-4.1.1/jq-3.3.1/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/datatables.min.js"></script>
+
+
+<!--     <link href="https://nightly.datatables.net/css/jquery.dataTables.css" rel="stylesheet" />
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://nightly.datatables.net/js/jquery.dataTables.js"></script> -->
+
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <!-- <script src="http://yadcf-showcase.appspot.com/resources/js/jquery.dataTables.yadcf.js"></script> -->
+    <link href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+
+
+    <link href="https://fonts.googleapis.com/css?family=Oxygen:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/v/bs4-4.1.1/jq-3.3.1/dt-1.10.18/b-1.5.4/b-colvis-1.5.4/b-html5-1.5.4/b-print-1.5.4/datatables.min.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+    integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+    integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+    crossorigin=""></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
+    <style>
+    /*CSS styling*/
+
+    *{font-family: 'Oxygen', Helvetica, sans-serif;}
+
+
+    ul{
+        list-style-type: none;
+    }
+
+    .tabcontent {
+        overflow: auto;
+        height: calc(100% - 140px);
+    }
+
+    .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+    }
+    .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.0s;
+        font-size: 17px;
+    }
+
+    .tab button:hover{
+        background-color: #ddd;
+    }
+
+    .tab button.active{
+        background-color: #ccc;
+    }
+
+    .tree_rect {
+      cursor: pointer;
+      fill: #fff;
+
+      fill-opacity: 0.8;
+      stroke: #3182bd; /* 3182bd */
+      stroke-width: 1.5px;
+    }
+
+    .node rect {
+        cursor: pointer;
+        fill: #fff;
+        fill-opacity: 0.6;
+        stroke: #3182bd;
+        stroke-width: 1.5px;
+    }
+
+    .node text {
+        font: 12px;
+        pointer-events: none;
+    }
+
+    .link {
+        fill: none;
+        stroke: #9ecae1;
+        stroke-width: 1.5px;
+    }
+
+    .mags_mash_tooltip {
+        font-family: 'Oxygen', Helvetica, sans-serif;
+        position: absolute;
+        z-index: 10;
+        pointer-events: none;
+        background-color: #7ab9ff;
+        text-align: center;
+        padding: 4px;
+        font-weight: bold;
+        border-radius: 4px;
+        color: #1e1e1e;
+        data-html: true;
+    }
+
+    .title_text {
+        font-family: monospace;
+        width: 75;
+        height: 75;
+        text-anchor: middle;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-weight: bold;
+        fill: black;
+    }
+
+    .legendTitle {
+        font-size: 14px;
+        fill: black;
+        font-weight: 300;
+    }
+
+    #treegroup {
+        display: flex;
+        flex-direction: row;
+        overflow: auto;
+    }
+
+    #treeid {
+        display: flex;
+        flex-direction: column;
+    }
+    #treemap {
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+    }
+
+    #treelegend{
+      display: flex;
+      display: row
+    }
+
+    .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr; /* fraction*/
+        max-width: 100vh;
+    }
+
+    </style>
+
+</head>
+<!-- HTML below -->
+<body style="height:100vh">
+    <div style="height: 140px;">
+        <div class='tab'>
+            <button class="tablinks" onclick="openTab(event, 'stats')" id="defaultOpen">List View</button>
+            <button class="tablinks" onclick="openTab(event, 'treetab')">Ecosystem Tree</button>
+            <button class="tablinks" onclick="openTab(event, 'maptab')">Map</button>
+        </div>
+
+        <div>
+            <div class="container" id="sliders">
+                <div id="dist_slider">
+                    <p>
+                        <label style="border-right: 10px">Distance Filter: </label><input type="text" id="live_range_dist" readonly style="border:0; color:#6dacff; font-weight:bold; width: 120px;">
+                    </p>
+                    <div id="dist_range" style="width:200px"></div>
+                </div>
+                <!-- <div id="compl_slider">
+                    <p>
+                        <label style="border-right: 10px">Completeness Filter: </label><input type="text" id="live_range_compl" readonly style="border:0; color:#6dacff; font-weight:bold; width: 120px;">
+                    </p>
+                    <div id="compl_range" style="width:200px"></div>
+                </div>
+                <diva id="cont_slider">
+                    <p>
+                        <label style="border-right: 10px">Contamination Filter: </label><input type="text" id="live_range_cont" readonly style="border:0; color:#6dacff; font-weight:bold; width: 120px;">
+                    </p>
+                    <div id="cont_range" style="width:200px; margin-bottom: 20px;"></div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+
+    <!--
+    Recursive Tree structure below, fill in with tree
+
+
+    going to replace this tree thing with html
+    -->
+    <div id='stats' class="tabcontent">
+
+        <table id='stats_table' style="width:98%;" class='table table-striped table-bordered'>
+            <thead>
+                <tr>
+                    <td>Input Name</td>
+                    <td>Containment Index (est.)</td>
+                    <td>Jaccard Index (est.)</td>
+                    <td>Assembly Id</td>
+                    <td>Biosample</td>
+                    <td>Species</td>
+                    <td>Study Name</td>
+                    <td>Intersection cardinality</td>
+                    <td>Sample id</td>
+                    <td>Collection date</td>
+                    <td>Analysis completed date</td>
+                    <td>Geo-location name</td>
+                    <td>Environment Biome</td>
+                    <td>Environment Material/</td>
+                    <td>Environment Feature</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in stats %}
+                <tr>
+                    <td>{{item.input_name}}</td>
+                    <td class="sorting_1">{{item.containment_index}}</td>
+                    <td>{{item.jaccard_index}}</td>
+                    <td>{{item.assembly_id}}</td>
+                    <td>{{item.biosample}}</td>
+                    <td>{{item.species}}</td>
+                    <td>{{item.study-name}}</td>
+                    <td>{{item.intersection}}</td>
+                    <td>{{item.sample_id}}</td>
+                    <td>{{item.collection-date}}</td>
+                    <td>{{item.analysis-completed}}</td>
+                    <td>{{item.geo-loc-name}}</td>
+                    <td>{{item.environment-biome}}</td>
+                    <td>{{item.environment-material}}</td>
+                    <td>{{item.environment-feature}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <div id="treetab" class="tabcontent" style="width: 100%;">
+        <div id="tree_group" class="grouping" style="height:100%">
+        </div>
+    </div>
+
+
+    <div id="maptab" class="tabcontent">
+        <div id="mapid" style="height: 900px; width: 1200px;"></div>
+    </div>
+
+    <script>
+        var dist_range;
+
+        $.fn.dataTable.ext.search.push(
+            function( settings, data, dataIndex ) {
+                var min = parseFloat(dist_range.slider( "values", 0 ));
+                var max = parseFloat(dist_range.slider( "values", 1 ));
+                var col = parseFloat( data[1] ) || 0; // data[number] = column number
+                if ( ( isNaN( min ) && isNaN( max ) ) ||
+                    ( isNaN( min ) && col <= max ) ||
+                    ( min <= col   && isNaN( max ) ) ||
+                    ( min <= col   && col <= max ) )
+                {
+                    return true;
+                }
+                return false;
+            }
+        );
+
+        var ranges = {{ranges|safe}}
+        var num_steps = 100
+
+        var min_dist_value  = ranges[0];
+        var max_dist_value  = ranges[1];
+
+        dist_range  = $("#dist_range")
+        var live_range_dist  = $("#live_range_dist")
+        dist_range.slider({
+                range: true,
+                min: ranges[0],
+                max: ranges[1],
+                step: ranges[2],
+                values: [ ranges[0], ranges[1] ],
+                slide: function( event, ui ) {
+                  live_range_dist.val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+                },
+                stop: function( event, ui ) {
+                    table.draw();
+                    min_dist_value = ui.values[0]
+                    max_dist_value = ui.values[1]
+                    update_root(root, min_dist_value, max_dist_value, false)
+                        // min_compl_value, max_compl_value, min_cont_value, max_cont_value, false)
+                    if (sources.length > 1){recount_sources(root)}
+                    update_tree(root)
+                    if (sources.length > 1){recolor_rects_and_counts()}
+                }
+        });
+        live_range_dist.val(dist_range.slider("values", 0) + " - " + dist_range.slider( "values", 1 ) );
+
+        var table;
+
+        $(document).ready( function () {
+
+            table = $('#stats_table').DataTable({
+                'dom': "<'row'<'col-sm-6'B><'col-sm-6'f>>t<'row'<'col-sm-4'i><'col-sm-8'p>>",
+                'buttons': ['copy', 'csv', 'print', 'colvis'],
+                'bFilter': true
+            });
+        });
+    </script>
+
+    <script>
+        function openTab(evt, name) {
+            // Declare all variables
+            var i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(name).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        document.getElementById("defaultOpen").click();
+    </script>
+
+
+    <script>
+
+        var markers={{ markers|safe }};
+        var mymap = new L.map("mapid").setView([37.87, -122.25],8);
+
+        // create the tile layer with correct attribution
+        var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        var osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
+        var osm = new L.TileLayer(osmUrl, {attribution: osmAttrib}).addTo(mymap);
+
+        for (i=0;i<markers.length;i++) {
+            var map_pop_up_text;
+            map_pop_up_text = "<h3>"+markers[i].name+"</h3><p>"
+            if (sources.length > 1){
+                map_pop_up_text = map_pop_up_text + "Inputs:</p><p>"
+                for (j = 0; j < markers[i].inputs; j++){
+                    map_pop_up_text = map_pop_up_text + markers[i].inputs[j] + "</p><p>"
+                }
+            }
+            map_pop_up_text = map_pop_up_text + markers[i].details+"</p>"
+
+            var marker = new L.marker([markers[i].lat, markers[i].lng]).addTo(mymap).bindPopup(map_pop_up_text);
+        }
+
+    </script>
+
+    <script>
+        var tree = {{tree|safe}}
+        var sources = {{sources|safe}}
+        var short_sources = {{short_sources|safe}}
+        var number_of_points = {{number_of_points|safe}}
+    </script>
+
+    <script>
+        if (sources.length > 1){
+            var legendDiv, treemapDiv, treeDiv, treegroupDiv
+            treegroupDiv = document.createElement('div');
+            treegroupDiv.id = 'treegroup';
+            treegroupDiv.style="max-height:calc(100%-65px)";
+
+            treeDiv = document.createElement('div');
+            treeDiv.id = 'treeid';
+
+            treemapDiv = document.createElement('div');
+            treemapDiv.id = 'treemap';
+
+            legendDiv = document.createElement('div');
+            legendDiv.id = 'treelegend';
+            legendDiv.style = "height:65px";
+
+            document.getElementById('tree_group').appendChild(treegroupDiv)
+            document.getElementById('tree_group').appendChild(legendDiv)
+            document.getElementById('treegroup').appendChild(treeDiv)
+            document.getElementById('treegroup').appendChild(treemapDiv)
+
+        }else{
+            treeDiv = document.createElement('div');
+            treeDiv.id = 'treeid';
+            document.getElementById('tree_group').append(treeDiv)
+        }
+
+        var margin = {top: 30, right: 20, bottom: 30, left: 20},
+            barHeight = 25,
+            map_width = (sources.length + 1) * barHeight,
+            map_window_width = Math.min(map_width, 600),
+            tree_map_gap = 20,
+            title_height = 150,
+            lwidth = 50;
+
+        var min_tree_width = 300;
+
+        var allotted_width = Math.max(map_window_width + min_tree_width + tree_map_gap + margin.left + margin.right,850);
+
+        var tree_width = Math.max(allotted_width - (map_window_width + tree_map_gap + margin.left + margin.right), min_tree_width);
+        var barWidth = tree_width;
+            // barWidth = (tree_width - margin.left - margin.right) * 0.8;
+
+        var i = 0,
+            duration = 250,
+            shorter_duration = 2.0*(duration/4.0),
+            root,
+            total_root;
+
+        var diagonal = d3.linkHorizontal()
+            .x(function(d) { return d.y; })
+            .y(function(d) { return d.x; });
+
+        var tooltip = d3.select("#tree_group").append("div").attr("class", 'mags_mash_tooltip');
+
+        var svg = d3.select("#treeid").append("svg")
+            .attr("width", tree_width + tree_map_gap)// + margin.left + margin.right)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // only include here if we have more than 1 source
+
+        if (sources.length > 1){
+            var mapsvg = d3.select("#treemap").style("width",map_width + tree_map_gap)
+                .append("svg")
+                .attr("id","treemap_svg")
+                .attr("width", map_width + tree_map_gap)
+                .append("g")
+                .attr("transform", "translate(0," + margin.top + ")");
+
+            var svg2 = d3.select("#treelegend").style("width", allotted_width).append("svg")
+                .attr("width", allotted_width)
+              .append("g")
+                .attr("transform", "translate(" + (margin.left + tree_map_gap + tree_width) + "," + margin.top + ")");
+
+            var domainList = []
+            for (i = 1; i<9; i++){
+              domainList.push((number_of_points/8) * i)
+            }
+            if (domainList[0] <= 1){
+                var temp = domainList[0]
+                domainList.splice(0,0, temp + (1.0 - temp)/2.0)
+            } else{
+                domainList.splice(0,0,1)
+            }
+
+            title_group = mapsvg.append('g')
+
+            for (let i = 0; i < sources.length; i++){
+                var titles = title_group.append('rect')
+                    .attr("y", 0)
+                    .attr("x", (i * barHeight) + tree_map_gap)
+                    .attr("height", title_height)
+                    .attr("width", barHeight)
+                    .attr("fill" , '#7ab9ff')
+                    // .attr("stroke", "#3182bd")
+                    .attr("stroke", "white")
+                    .on("mouseover", function(d){
+                        tooltip.style("color", "#1e1e1e")
+                        tooltip.style("background-color", "#7ab9ff")
+                        tooltip.text(sources[i].toString())
+                    })
+                    .on("mousemove", function(d){ return tooltip.style("top", (event.pageY - 30) + "px").style("left", (event.pageX) + "px")})
+                    .on("mouseout", function(d){ return tooltip.style("top", "-9999px"); })
+
+
+                title_group.append("text")
+                    .attr("class", "title_text")
+                    .attr("transform", "translate("+((i * barHeight) + tree_map_gap + (barHeight/4))+","+(-(i * barHeight) - barWidth - tree_map_gap +(title_height/2) )+") rotate(90)")
+                    // .attr("transform", "translate("+ (barHeight/2) +","+ (title_height/2) +") " + "rotate(90)")
+                    .attr("y", 0)
+                    .attr("x", (i * barHeight) + barWidth + tree_map_gap)
+                    .style("pointer-events", "none")
+                    .text(short_sources[i])
+            }
+
+            var colorScale = d3.scaleLinear()
+                .domain(domainList)
+                .range(["#2c7bb6","#00a6ca","#00ccbc","#90eb9d","#ffff8c","#f9d057","#f29e2e","#e76818","#d7191c"]);
+            // 2c7bb6
+            var grayScale = d3.scaleLinear()
+                    .domain([0,1])
+                    .range(["#d6d6d6", "#1e1e1e"])
+
+            var zeroGray = "#d6d6d6"
+            var oneBlack = "#1e1e1e"
+            var nullGray = "#919191"
+
+            var countScale = d3.scaleLinear()
+              .domain([0, number_of_points])
+              .range([0, allotted_width])
+
+            //Calculate the variables for the temp gradient
+            var numStops = 10;
+            countRange = countScale.domain();
+            countRange[2] = countRange[1] - countRange[0];
+            countPoint = [];
+            for(var i = 0; i < numStops; i++) {
+              countPoint.push(i * countRange[2]/(numStops-1) + countRange[0]);
+            }
+
+            var defs = mapsvg.append("defs");
+
+            var linearGradient = defs.append("linearGradient")
+                .attr("id", "linear-gradient")
+                .attr("x1", "0%").attr("y1", "0%")
+                .attr("x2", "100%").attr("y2", "0%")
+                .selectAll("stop")
+                .data( d3.range(numStops) )
+                .enter().append("stop")
+                .attr("offset", function(d,i) {
+                  return countScale( countPoint[i] )/allotted_width;
+                })
+                .attr("stop-color", function(d,i) {
+                  return colorScale( countPoint[i] );
+                });
+
+            var legendY_pos = -45
+            var legendWidth = 220;
+            var legendHeight = 15
+            var legendsvg = svg2.append('g')
+                .attr("class","legendWrapper")
+                .attr("transform","translate("+ (tree_width + legendWidth/2) +","+ (40) +")")
+
+            legendsvg.append("rect")
+                .attr("x", -legendWidth/2)
+                .attr("y", legendY_pos)
+                .attr("width", legendWidth)
+                .attr("height", legendHeight)
+                .style("fill", "url(#linear-gradient)")
+
+            legendsvg.append("text")
+                .attr("class","legendTitle")
+                .attr("x",0)
+                .attr("y",legendY_pos-10)
+                .style("text-anchor","middle")
+                .text("Number of Studies")
+
+            //Set scale for x-axis
+            var xScale = d3.scaleLinear()
+               .range([-legendWidth/2, legendWidth/2])
+               .domain([ 1, number_of_points] );
+
+            //Define x-axis
+            var xAxis = d3.axisBottom()
+                .ticks(5)
+                //.tickFormat(formatPercent)
+                .scale(xScale);
+
+            //Set up X axis
+            legendsvg.append("g")
+              .attr("class", "axis")
+              .attr("transform", "translate(0," + (legendY_pos + legendHeight) + ")")
+              .call(xAxis);
+        }
+
+        root = d3.hierarchy(tree);
+        root.x0 = 0;
+        root.y0 = 0;
+        update_root(root, min_dist_value, max_dist_value, true)
+        if (sources.length > 1){recount_sources(root)}
+        update_tree(root)
+
+        function update_root(total_root, min_dist, max_dist, set)
+            // total_root should always contain all the data.
+            // root is what we would like to update to have only the data we are interested in.
+
+            total_root.bar_filter = false
+            remove_limb = recurse_root(total_root, min_dist, max_dist, set)
+        }
+
+
+
+        function check_in_range(t, data, min_val, max_val){
+            if (max_val < t.data[data] ||  min_val > t.data[data]){
+                t.data.bar_filter = true
+            }
+            return t
+        }
+
+        function recurse_root(data, min_dist, max_dist, set){
+            if (data.children){
+                var children_len = data.children.length;
+                var remove = new Array(children_len).fill(false);
+
+                var dist, curr_len
+                 // compl, cont, curr_len
+
+                for (let i = 0; i < children_len; i++){
+                    var t = data.children[i]
+                    if (t.data.name){
+                        t.data.bar_filter = false
+                        // we set tree filter here so that the value is set
+                        t = check_in_range(t, "dist", min_dist, max_dist)
+                        remove[i] = t.data.bar_filter
+
+                    }else{
+                        remove_limb = recurse_root(t, min_dist, max_dist, set)
+                                    // min_compl, max_compl, min_cont, max_cont, set)
+
+                        remove[i] = remove_limb
+                        if (set){
+                            data.children[i].data.bar_filter = remove_limb
+                        }
+                    }
+                }
+                var remove_curr = remove.reduce((sum, r) => sum && r, true);
+                if (remove_curr){
+                    return true
+                }else{
+                    return false
+                }
+            }
+            else{
+                console.log('wow so bad')
+            }
+        }
+
+        function bar_filtration(d){
+            if (d.data.filter_my_children){
+                var curr_depth = d.depth
+                //get all descendants and mark them as filtered out by tree
+                d.descendants().forEach((child) => {
+                    if (child.depth > curr_depth){child.data.tree_filter = true}
+                })
+            }
+            return (d.data.bar_filter == false) && (d.data.tree_filter == false)
+        }
+
+
+        // function get_row_table_data(d, i, shared_category){
+        //     var rows = [];
+        //     d.data.sources[i].forEach(function(src){
+        //         var row = []
+        //         if (d.data.dist[src] != null){
+        //             row.push(d.data.dist[src]) //Distance
+        //             row.push( src.toString()) //MAG ID
+        //             // row['KBase ID'] =
+        //             // row['GOLD Analysis Project ID'] =
+        //             // row['GOLD Sequencing Project ID'] =
+        //             row.push(d.data.truncated_name) // IMG Genome ID
+        //             //row.push(d.data.compl[src]) // Completeness
+        //             //row.push(d.data.cont[src]) // Contamination
+        //             // row['MIMAG'] =
+        //             row.push(d.data.name) // Project/Study Name
+        //             row.push(shared_category)
+        //
+        //             rows.push(row)
+        //         }
+        //     })
+        //     return rows
+        // }
+
+        // function close_pop_up(){
+        //     // currently pops up on the bottom
+        //     document.getElementById("tree_table_wrapper").style.height = "0%"
+        //     document.getElementById("tree_group").style.height = "100%"
+        //     document.getElementById("treelegend").style.height = "60px"
+        // }
+        //
+        // function open_pop_up(){
+        //     //
+        //     document.getElementById("tree_table_wrapper").style.height = "100%"
+        //     document.getElementById("tree_group").style.height = "0%"
+        //     document.getElementById("treelegend").style.height = "0px"
+        // }
+
+        function recount_sources(root){
+            var source_children = {}
+            root.eachAfter(function(n){
+                if (!n.data.bar_filter){
+                    if (!n.data.name){
+                        source_children = {}
+                        leaf_nodes = n.leaves()
+                        leaf_nodes.forEach((ln) => {
+                            if (!ln.data.bar_filter){
+                                Object.keys(ln.data.sources).forEach((i) => {
+                                    var non_nulls = Object.values(ln.data.sources[i]).filter(key=>ln.data.dist[key]!=null).length
+
+                                    if (non_nulls > 0){
+                                        if (i in source_children){
+                                            source_children[i] = source_children[i] + non_nulls
+                                        }else{
+                                            source_children[i] = non_nulls
+                                        }
+                                    }
+                                    if (source_children[i] == 0){
+                                        delete source_children[i]
+                                    }
+                                })
+                            }
+                        });
+                        n.data.sources = source_children
+                        if (Object.keys(source_children).length == 0){
+                            n.data.count = "(0)"
+                        }else{
+                            n.data.count = "(" + (Object.values(source_children).reduce((a,b) => a+b)) + ")"
+                        }
+                    }
+                }
+            })
+        }
+
+        function recolor_rects_and_counts(){
+            for (let i = 0; i < sources.length; i++){
+                d3.selectAll('.map_rect_'+i.toString()).style('fill', function(d, i){
+                    var idx = i % sources.length
+                    if (idx in d.data.sources){
+                        if (d.data.name){
+                            return oneBlack
+                            // var dist_non_nulls =
+                            // var dist_non_nulls = Object.values(d.data.sources[idx]).filter(key=>d.data.dist[key]!=null).length
+                            // if (dist_non_nulls > 0){
+                            //     return oneBlack
+                            // }else{
+                            //     return nullGray
+                            // }
+                        }else{
+                            return colorScale(d.data.sources[idx])
+                        }
+                    }else{
+                        return zeroGray
+                    }
+                })
+            }
+            d3.selectAll('.count_text').text(function(d){return d.data.count})
+                  .attr('dx', function(d){return barWidth - ((d.data.count.length - 1)*7) - 13 - d.depth * margin.left})
+
+        }
+
+
+        function update_tree(source) {
+          // Set all tree filters to be false
+          root.descendants().forEach((node) => {node.data.tree_filter = false})
+          // Compute the flattened node list.
+          var nodes = root.descendants().filter(bar_filtration);
+
+          var height = Math.max(50, (nodes.length * barHeight) + margin.top + margin.bottom + tree_map_gap +title_height);
+
+          d3.select("svg").transition()
+              .duration(duration)
+              .attr("height", height);
+
+          if (sources.length > 1){
+              d3.select("#treemap_svg").transition()
+                .duration(duration)
+                .attr("height", height);
+          }
+          document.getElementById("treeid").style.height = height.toString() + "px"
+          if (sources.length > 1){
+              document.getElementById("treemap").style.height = height.toString() + "px"
+              document.getElementById("treegroup").style.height = height.toString() + "px"
+          }
+          d3.select(self.frameElement).transition()
+            .duration(duration)
+            .style("height", height + "px")
+
+          // Compute the "layout". TODO https://github.com/d3/d3-hierarchy/issues/67
+          var index = -1;
+
+          root.eachBefore(function(n) {
+            if (!n.data.bar_filter && !n.data.tree_filter){
+                n.x = ++index * barHeight;
+                n.y = n.depth * 20;
+            }
+          });
+
+          // Update the nodes…
+          var node = svg.selectAll(".node")
+            .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+          var nodeEnter = node.enter().append("g")
+              .attr("class", "node")// "node")
+              .attr("transform", function(d) { return "translate(0,0)";}) //+ source.y0 + "," + source.x0 + ")"; })
+              .style("opacity", 0);
+
+
+        // we only want to do this if the lenght of sources > 1
+        // +++++++++++++++++++++++++++++++++++++++++++++++++
+          if (sources.length > 1){
+              var map_node = mapsvg.selectAll(".node")
+                .data(nodes,function(d) {
+                    return d.id || (d.id = ++i);
+                });
+
+              var map_nodeEnter = map_node.enter().append("g")
+                  .attr("class", "node")
+                  .attr("transform", function(d) { return "translate(0," + source.x0 + ")"; })
+                  .style("opacity", 0);
+
+              // ========================================================================
+              for (let i = 0; i < sources.length; i++){
+                map_nodeEnter.append("rect").attr("class",function(d){ return "map_rect_"+i.toString()})
+                    .attr("y", (-barHeight/2) + title_height + tree_map_gap)
+                    .attr("height", barHeight)
+                    .attr("width", barHeight)
+                    .attr("transform", function(d) {return "translate("+((i * barHeight) + tree_map_gap)+",0)"})
+                    .attr("border", 0)
+                    .style("stroke","white")
+                    .style("stroke-opacity", 0.6)
+                    // .style("fill","#ff0571")
+                    .style("fill", function(d) {
+                        if (d.data.name){
+                            if (i in d.data.sources){
+                                return oneBlack
+                                // var non_nulls = Object.values(d.data.sources[i]).filter(key=>d.data.dist[key]!=null).length
+                                // if (non_nulls > 0){
+                                //     return oneBlack
+                                // }else{
+                                //     return nullGray
+                                // }
+                            }else{
+                                return zeroGray
+                            }
+                        }else{
+                            if (i in d.data.sources){
+                                return colorScale(d.data.sources[i])
+                            }else{
+                                return zeroGray
+                            }
+                        }
+                    })
+                    .on("mouseover", function(d){
+                        if (i in d.data.sources){
+                            if (d.data.name){
+                                tooltip.style("background-color",oneBlack)
+                                tooltip.style("color", "white")
+                            }else{
+                                tooltip.style("background-color",colorScale(d.data.sources[i]))
+                                tooltip.style("color", "#1e1e1e")
+                            }
+
+                            // if (d.data.name){
+                            //     var st = "<a style=\"text-decoration: underline\">MAG ID --- Distance</a><br/>"
+                            //     var used = false
+                            //     d.data.sources[i].forEach((key) => {
+                            //         if (d.data.dist[key] != null){
+                            //             st = st + key + " : " + d.data.dist[key] + "<br/>"
+                            //             used = true
+                            //         }else{
+                            //             st+= "<a style=\"color:#828282;\">" + key + " : " + d.data._dist[key] + "</a>" + "<br/>"
+                            //         }
+                            //
+                            //     })
+                            //     if (used){
+                            //         tooltip.html(st)
+                            //     }
+                            // }else{
+                            tooltip.text(d.data.sources[i].toString())
+                                // we want to also update the rect color here
+                            // }
+                        }else{
+                            tooltip.text("bird up!")
+                        }
+                    })
+                    .on("mousemove", function(d){
+                        if (i in d.data.sources){
+                            if (!d.data.bar_filter){
+                                if (!d.data.name){
+                                    return tooltip.style("top", (event.pageY - 30) + "px").style("left", (event.pageX) + "px")
+                                }
+                            }
+                        }
+                    })
+                    .on("mouseout", function(d){
+                        if (i in d.data.sources){
+                            if (!d.data.bar_filter){
+                                if (!d.data.name){
+                                    return tooltip.style("top", "-9999px");
+                                }
+                            }
+                        }
+                    });
+                    // .on("click", function(d){
+                    //         if (i in d.data.sources){
+                    //             if (!d.data.bar_filter){
+                    //                 show_tree_table(d, i)
+                    //             }
+                    //         }
+                    // });
+              }
+          }
+          // +++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+          // ========================================================================
+          // want only include this if its a leaf...
+          nodeEnter.append("rect")
+              .attr("class", "tree_rect")
+              .attr("y", (-barHeight/2) + title_height + tree_map_gap)
+              .attr("height", barHeight)
+              .attr("width", leaf_width)
+              .attr("border", 0)
+              //.style('stroke', "#7ab9ff")
+              .style("fill", color)
+              .on("click", click)
+              // .append("svg:title")
+              // .text("Distance")
+              .on("mouseover", show_dist_text)
+              .on("mousemove", function(d){ return tooltip.style("top", (event.pageY - 30) + "px").style("left", (event.pageX) + "px")})
+              .on("mouseout", function(d){return tooltip.style("top", "-9999px");})
+
+          nodeEnter.append("text")
+                .attr('y', title_height + tree_map_gap)
+                .attr("dy", 5)
+                .attr("dx", 4.5)
+                .style("font-weight", "bold")
+                .text(function(d){
+                  if(d.children){return ""
+                  }else{return d.data.dist}
+                })
+
+          // ========================================================================
+          // ------------------------------------------------------------------------
+          // Enter any new nodes at the parent's previous position.
+          nodeEnter.append("rect")
+              .attr("class", "tree_rect")
+              .attr("y", (-barHeight / 2) + title_height + tree_map_gap)
+              .attr("height", barHeight)
+              .attr("transform", leaf_transform)
+              .attr("width", function(d){
+                  return barWidth - d.depth * margin.left // - leaf_width(d) * 2
+              })
+              .style("fill", color)
+              .on("click", click)
+              .on("mouseover", function(d){ if(d.data.name){
+                tooltip.style("color", "#1e1e1e")
+                tooltip.style("background-color", "#7ab9ff")
+                return tooltip.text(d.data.name); }})
+              .on("mousemove", function(d){ if(d.data.name){return tooltip.style("top", (event.pageY - 30) + "px").style("left", (event.pageX) + "px")}})
+              .on("mouseout", function(d){ if(d.data.name){return tooltip.style("top", "-9999px"); }});
+
+
+          nodeEnter.append("text")
+              .attr('y', title_height + tree_map_gap)
+              .attr("dy", 5)
+              .attr("dx", 5.5)
+              .attr('transform', leaf_transform)
+              .text(function(d) { return d.data.truncated_name; })
+
+          nodeEnter.append("text")
+              .attr("class", "count_text")
+              .attr('y', title_height + tree_map_gap)
+              .attr('dy', 5)
+              .style("font-family","monospace")
+              .attr('dx', function(d){return barWidth - ((d.data.count.length - 1)*7) - 13 - d.depth * margin.left})
+              .style("fill", "#9b9b9b")
+              .text(function(d) {return d.data.count})
+          // ------------------------------------------------------------------------
+
+          // Transition nodes to their new position.
+          nodeEnter.transition()
+              .duration(duration)
+              .attr("transform", function(d) { return "translate(" + d.y  + "," + d.x + ")"; })
+              .style("opacity", 1);
+
+          if (sources.length > 1){
+              map_nodeEnter.transition()
+                  .duration(duration)
+                  .attr("transform", function(d) { return "translate(0," + d.x + ")"; })
+                  .style("opacity", 1);
+          }
+          node.transition()
+              .duration(duration)
+              .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+              .style("opacity", 1)
+            .select("g.tree_rect")
+              .style("fill", color);
+
+          if (sources.length > 1){
+              map_node.transition()
+                  .duration(duration)
+                  .attr("transform", function(d) { return "translate(0," + d.x + ")"; })
+                  .style("opacity", 1)
+                .select("g.tree_rect")
+                  .style("fill", color);
+          }
+          // Transition exiting nodes to the parent's new position.
+          node.exit().transition()
+              .duration(shorter_duration)
+              // .attr("transform", function(d) { return "translate("+ source.y + "," + source.x + ")"; })
+              .style("opacity", 0)
+              .remove();
+          if (sources.length > 1){
+              map_node.exit().transition()
+                  .duration(shorter_duration)
+                  // .attr("transform", function(d) { return "translate(0," + source.x + ")"; })
+                  .style("opacity", 0)
+                  .remove();
+          }
+
+          // Stash the old positions for transition.
+          root.each(function(d) {
+            d.x0 = d.x;
+            d.y0 = d.y;
+          });
+
+        }
+
+
+        // Toggle children on click.
+        function click(d) {
+          if (!d.data.filter_my_children) {
+            d.data.filter_my_children = true
+            // d._children = d.children;
+            // d.children = null;
+          } else {
+            d.data.filter_my_children = false
+            // d.children = d._children;
+            // d._children = null;
+          }
+          update_tree(d);
+        }
+
+        function show_dist_text(d){
+            tooltip.style("color", "#1e1e1e")
+            tooltip.style("background-color", "#7ab9ff")
+            return tooltip.text("Containment Index");
+        }
+
+        function show_jaccard_text(d){
+            tooltip.style("color", "#1e1e1e")
+            tooltip.style("background-color", "#7ab9ff")
+            return tooltip.text("Jaccard Index");
+        }
+
+        function leaf_transform(d){
+          return "translate("+ (leaf_width(d)).toString() + ",0)"
+        }
+
+        function leaf_transform_2(d){
+            return "translate(" + (leaf_width(d) * 2).toString() + ",0)"
+        }
+
+        function leaf_width(d){
+          if (d.data.name){
+            return lwidth
+          }else{
+            return 0
+          }
+        }
+
+        // function stroke_color(d){
+        //   return d._children ? "#3182bd" : d.children ? "#3182bd" : "#7ab9ff";
+        // }
+
+        function color(d) {
+          return d._children ? "#badaff" : d.children ? "#badaff" : "#7ab9ff";
+        }
+    </script>
+
+</body>
+</html>

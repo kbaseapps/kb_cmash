@@ -17,7 +17,8 @@ RUN apt-get -y update &&\
     git clone https://github.com/dkoslicki/CMash.git &&\
     cd CMash &&\
     pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install -r requirements.txt && \
+    pip install scipy
 
 
 # -----------------------------------------

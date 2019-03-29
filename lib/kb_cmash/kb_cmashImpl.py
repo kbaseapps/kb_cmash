@@ -4,8 +4,7 @@ import os
 import subprocess
 from installed_clients.KBaseReportClient import KBaseReport
 from .utils.CMashUtils import CMashUtils
-from .utils.misc_utils import load_fasta
-
+from .utils.misc_utils import load_fastas
 #END_HEADER
 
 cmash_scripts = '/opt/CMash/CMash/scripts/'
@@ -37,6 +36,7 @@ class kb_cmash:
     def __init__(self, config):
         #BEGIN_CONSTRUCTOR
         self.callback_url = os.environ['SDK_CALLBACK_URL']
+        self.workspace_url = config['workspace-url']
         self.shared_folder = config['scratch']
         self.cfg = config
         #END_CONSTRUCTOR
@@ -53,20 +53,39 @@ class kb_cmash:
         # ctx is the context object
         # return variables are: output
         #BEGIN run_kb_cmash
-        ref = params['ref']
         curr_dir =  os.path.dirname(os.path.realpath(__file__))
-        db  = os.path.join(curr_dir, "utils/data", params['db'])
+
+        if params.get('ref'):
+            ref = params.get('ref')
+        else:
+            raise ValueError("must provide ws reference")
+        if params.get('db'):
+            db  = os.path.join(curr_dir, "utils/data", params.get('db'))
+        else:
+            raise ValueError("must provide reference database")
+        if params.get("n_max_results"):
+            n_max_results = params.get('n_max_results')
+        else:
+            raise ValueError("Must provide n_max_results")
+
         # get fasta file from input reference
-        fasta_path = load_fasta(self.callback_url, self.shared_folder, ref)
-        # form reference database
-        fasta_dir = []
-
+        fasta_paths = load_fastas(self.callback_url, self.shared_folder, ref)
+        # load utils
         cmu = CMashUtils(self.cfg, self.callback_url, params['workspace_name'])
-        # db = cmu.build_db(fasta_dir)
-        # db = "utils/data/soil_test_4_samples.h5"
-        output_csv = cmu.query_db(db, fasta_path)
-        output = cmu.get_report(output_csv)
-
+        results = cmu.query_db(db, fasta_paths)
+        filtered_results = {}
+        for upa in results:
+            if len(results[upa]) < 1:
+                pass
+            else:
+                filtered_results[upa] = results[upa]
+        if len(filtered_results) < 1:
+            html_path = os.path.join(self.shared_folder, "index.html")
+            with open(html_path, 'w') as f:
+                f.write("<h3>No inputs have matched with any metagenomes in databse: %s</h3>"%db)
+        else:
+            html_path = cmu.output_to_html(filtered_results, 'index.html')
+        output = cmu.get_report(html_path)
         #END run_kb_cmash
 
         # At some point might do deeper type checking...
