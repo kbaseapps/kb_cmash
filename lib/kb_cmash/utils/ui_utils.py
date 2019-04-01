@@ -16,16 +16,10 @@ def get_statistics(df_metadata, result, dist_col="containment_index",upa_name=No
     Returns:
 
     '''
-    # print('@'*80)
-    # print(df_metadata.columns)
-    # print(result)
-    # print('@'*80)
+
     df_id_col  = "assembly_id" #
     row_id_col = "assembly_id" #
     columns = df_metadata.columns
-    # print("metadata columns:::", columns)
-    # print("df_metadata length"/, len(df_metadata))
-    # print("df metadata", df_metadata[["sample_id","assembly_id"]].head(10))
     stats = []
     dist_dict = {}
     for row in result:
@@ -33,15 +27,12 @@ def get_statistics(df_metadata, result, dist_col="containment_index",upa_name=No
 
         df_row = df_metadata[df_metadata[df_id_col] == row[row_id_col]]
         df_row = df_row.reset_index()
-        # print("roww",row)
-        # print("df row:::", df_row)
-
         if len(df_row) > 1:
             raise ValueError("should only have 1 assembly id row in the dataframe.")
         for key, value in row.items():
-            curr[key.strip().lower().replace(' ','_')] = value
+            curr[key.strip().lower().replace(' ','_').replace('-', '_')] = value
         for col in columns:
-            curr[col.strip().lower().replace(' ','_')] = df_row.loc[0, col]
+            curr[col.strip().lower().replace(' ','_').replace('-', '_')] = df_row.loc[0, col]
 
         dist_dict[df_row.loc[0,'assembly_id']] = row[dist_col]
 
@@ -73,15 +64,14 @@ def create_tree(df, tree_cols, dist_dict, source_order=None):
                 dist = dist_dict[t]
             else:
                 dist = ""
-            truncated_name = df[df[col]==t].iloc[0]
+            truncated_name = df[df[col]==t].iloc[0]['assembly_id']
 
             tree.append({
                 'truncated_name': str(truncated_name),
                 'name': t,
-                'count': "({})".format(1)
+                'count': "({})".format(1),
             })
-            if source_order!=None:
-                tree[-1]['dist'] = dist
+            tree[-1]['dist'] = dist
 
         else:
             tree.append({
@@ -121,11 +111,11 @@ def get_locations(stats, markers, upa_name):
             markers[id_]['inputs'].append(upa_name)
         else:
             markers[id_] = {
-                'name': s['sample-name'],
+                'name': s['sample_name'],
                 'lat': s['latitude'],
                 'lng': s['longitude'],
-                'details': "Collection date: %s \nAnalysis completed: %s \nGeo-loc: %s"%(
-                        s["collection-date"], s["analysis-completed"], s["geo-loc-name"]
+                'details': "Collection date: %s <br>Analysis completed: %s <br>Geo-location: %s"%(
+                        s["collection_date"], s["analysis_completed"], s["geo_loc_name"]
                 ),
                 'inputs': [upa_name]
             }
@@ -233,6 +223,8 @@ def format_results(ws_url, cb_url, results, is_test=False):
         curr_df.loc[:,'upa'] = upa
         all_df.append(curr_df)
 
+    markers = [value for key, value in markers.items()]
+
     df = pd.concat(all_df)
 
     if len(upas) == 1:
@@ -252,12 +244,5 @@ def format_results(ws_url, cb_url, results, is_test=False):
         tree['sources'] = remap_sources(tree['sources'], upa_order)
         tree = rewind_tree(tree, upa_order)
         upa_names = [upa_names[idx] for idx in upa_order]
-
-    # print('='*100)
-    # print('stats:',stats)
-    # print('tree:', tree)
-    # print('upa_names',upa_names)
-    # print('markers:', markers)
-    # print('='*100)
 
     return stats, upa_names, tree, markers

@@ -170,18 +170,6 @@
                     </p>
                     <div id="dist_range" style="width:200px"></div>
                 </div>
-                <!-- <div id="compl_slider">
-                    <p>
-                        <label style="border-right: 10px">Completeness Filter: </label><input type="text" id="live_range_compl" readonly style="border:0; color:#6dacff; font-weight:bold; width: 120px;">
-                    </p>
-                    <div id="compl_range" style="width:200px"></div>
-                </div>
-                <diva id="cont_slider">
-                    <p>
-                        <label style="border-right: 10px">Contamination Filter: </label><input type="text" id="live_range_cont" readonly style="border:0; color:#6dacff; font-weight:bold; width: 120px;">
-                    </p>
-                    <div id="cont_range" style="width:200px; margin-bottom: 20px;"></div>
-                </div> -->
             </div>
         </div>
     </div>
@@ -211,7 +199,7 @@
                     <td>Analysis completed date</td>
                     <td>Geo-location name</td>
                     <td>Environment Biome</td>
-                    <td>Environment Material/</td>
+                    <td>Environment Material</td>
                     <td>Environment Feature</td>
                 </tr>
             </thead>
@@ -224,15 +212,15 @@
                     <td>{{item.assembly_id}}</td>
                     <td>{{item.biosample}}</td>
                     <td>{{item.species}}</td>
-                    <td>{{item.study-name}}</td>
+                    <td>{{item.study_name}}</td>
                     <td>{{item.intersection}}</td>
                     <td>{{item.sample_id}}</td>
-                    <td>{{item.collection-date}}</td>
-                    <td>{{item.analysis-completed}}</td>
-                    <td>{{item.geo-loc-name}}</td>
-                    <td>{{item.environment-biome}}</td>
-                    <td>{{item.environment-material}}</td>
-                    <td>{{item.environment-feature}}</td>
+                    <td>{{item.collection_date}}</td>
+                    <td>{{item.analysis_completed}}</td>
+                    <td>{{item.geo_loc_name}}</td>
+                    <td>{{item.environment_biome}}</td>
+                    <td>{{item.environment_material}}</td>
+                    <td>{{item.environment_feature}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -247,8 +235,16 @@
 
 
     <div id="maptab" class="tabcontent">
-        <div id="mapid" style="height: 900px; width: 1200px;"></div>
+        <div id="mapid" style="height: 600px; width: 800px;"></div>
     </div>
+
+    <script>
+        var tree = {{tree|safe}}
+        var sources = {{sources|safe}}
+        var short_sources = {{short_sources|safe}}
+        var number_of_points = {{number_of_points|safe}}
+    </script>
+
 
     <script>
         var dist_range;
@@ -291,7 +287,6 @@
                     min_dist_value = ui.values[0]
                     max_dist_value = ui.values[1]
                     update_root(root, min_dist_value, max_dist_value, false)
-                        // min_compl_value, max_compl_value, min_cont_value, max_cont_value, false)
                     if (sources.length > 1){recount_sources(root)}
                     update_tree(root)
                     if (sources.length > 1){recolor_rects_and_counts()}
@@ -327,10 +322,17 @@
             for (i = 0; i < tablinks.length; i++) {
                 tablinks[i].className = tablinks[i].className.replace(" active", "");
             }
+            console.log(name)
 
             // Show the current tab, and add an "active" class to the button that opened the tab
             document.getElementById(name).style.display = "block";
             evt.currentTarget.className += " active";
+
+            if (name == "maptab"){
+                console.log("i get in here")
+                mymap.invalidateSize()
+            }
+
         }
         document.getElementById("defaultOpen").click();
     </script>
@@ -338,16 +340,29 @@
 
     <script>
 
-        var markers={{ markers|safe }};
-        var mymap = new L.map("mapid").setView([37.87, -122.25],8);
+        let markers={{ markers|safe }};
+
+        let avg_lat = 0.0;
+        let avg_lng = 0.0;
+        for (i=0; i < markers.length; i++){
+            avg_lat = avg_lat + markers[i].lat
+            avg_lng = avg_lng + markers[i].lng
+        }
+        avg_lat = avg_lat/markers.length
+        avg_lng = avg_lng/markers.length
+
+        console.log(avg_lat)
+        console.log(avg_lng)
+
+        var mymap = new L.map("mapid").setView([avg_lat, avg_lng],2);
 
         // create the tile layer with correct attribution
-        var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-        var osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
-        var osm = new L.TileLayer(osmUrl, {attribution: osmAttrib}).addTo(mymap);
+        let osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        let osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
+        let osm = new L.TileLayer(osmUrl, {attribution: osmAttrib}).addTo(mymap);
 
         for (i=0;i<markers.length;i++) {
-            var map_pop_up_text;
+            let map_pop_up_text;
             map_pop_up_text = "<h3>"+markers[i].name+"</h3><p>"
             if (sources.length > 1){
                 map_pop_up_text = map_pop_up_text + "Inputs:</p><p>"
@@ -357,16 +372,9 @@
             }
             map_pop_up_text = map_pop_up_text + markers[i].details+"</p>"
 
-            var marker = new L.marker([markers[i].lat, markers[i].lng]).addTo(mymap).bindPopup(map_pop_up_text);
+            let marker = new L.marker([markers[i].lat, markers[i].lng]).addTo(mymap).bindPopup(map_pop_up_text);
         }
 
-    </script>
-
-    <script>
-        var tree = {{tree|safe}}
-        var sources = {{sources|safe}}
-        var short_sources = {{short_sources|safe}}
-        var number_of_points = {{number_of_points|safe}}
     </script>
 
     <script>
@@ -573,7 +581,7 @@
         if (sources.length > 1){recount_sources(root)}
         update_tree(root)
 
-        function update_root(total_root, min_dist, max_dist, set)
+        function update_root(total_root, min_dist, max_dist, set){
             // total_root should always contain all the data.
             // root is what we would like to update to have only the data we are interested in.
 
@@ -639,44 +647,6 @@
             return (d.data.bar_filter == false) && (d.data.tree_filter == false)
         }
 
-
-        // function get_row_table_data(d, i, shared_category){
-        //     var rows = [];
-        //     d.data.sources[i].forEach(function(src){
-        //         var row = []
-        //         if (d.data.dist[src] != null){
-        //             row.push(d.data.dist[src]) //Distance
-        //             row.push( src.toString()) //MAG ID
-        //             // row['KBase ID'] =
-        //             // row['GOLD Analysis Project ID'] =
-        //             // row['GOLD Sequencing Project ID'] =
-        //             row.push(d.data.truncated_name) // IMG Genome ID
-        //             //row.push(d.data.compl[src]) // Completeness
-        //             //row.push(d.data.cont[src]) // Contamination
-        //             // row['MIMAG'] =
-        //             row.push(d.data.name) // Project/Study Name
-        //             row.push(shared_category)
-        //
-        //             rows.push(row)
-        //         }
-        //     })
-        //     return rows
-        // }
-
-        // function close_pop_up(){
-        //     // currently pops up on the bottom
-        //     document.getElementById("tree_table_wrapper").style.height = "0%"
-        //     document.getElementById("tree_group").style.height = "100%"
-        //     document.getElementById("treelegend").style.height = "60px"
-        // }
-        //
-        // function open_pop_up(){
-        //     //
-        //     document.getElementById("tree_table_wrapper").style.height = "100%"
-        //     document.getElementById("tree_group").style.height = "0%"
-        //     document.getElementById("treelegend").style.height = "0px"
-        // }
-
         function recount_sources(root){
             var source_children = {}
             root.eachAfter(function(n){
@@ -687,14 +657,10 @@
                         leaf_nodes.forEach((ln) => {
                             if (!ln.data.bar_filter){
                                 Object.keys(ln.data.sources).forEach((i) => {
-                                    var non_nulls = Object.values(ln.data.sources[i]).filter(key=>ln.data.dist[key]!=null).length
-
-                                    if (non_nulls > 0){
-                                        if (i in source_children){
-                                            source_children[i] = source_children[i] + non_nulls
-                                        }else{
-                                            source_children[i] = non_nulls
-                                        }
+                                    if (i in source_children){
+                                        source_children[i] = source_children[i] + 1
+                                    }else{
+                                        source_children[i] = 1
                                     }
                                     if (source_children[i] == 0){
                                         delete source_children[i]
@@ -715,18 +681,11 @@
 
         function recolor_rects_and_counts(){
             for (let i = 0; i < sources.length; i++){
-                d3.selectAll('.map_rect_'+i.toString()).style('fill', function(d, i){
-                    var idx = i % sources.length
+                let idx = i % sources.length
+                d3.selectAll('.map_rect_'+idx.toString()).style('fill', function(d, i){
                     if (idx in d.data.sources){
                         if (d.data.name){
                             return oneBlack
-                            // var dist_non_nulls =
-                            // var dist_non_nulls = Object.values(d.data.sources[idx]).filter(key=>d.data.dist[key]!=null).length
-                            // if (dist_non_nulls > 0){
-                            //     return oneBlack
-                            // }else{
-                            //     return nullGray
-                            // }
                         }else{
                             return colorScale(d.data.sources[idx])
                         }
@@ -737,7 +696,6 @@
             }
             d3.selectAll('.count_text').text(function(d){return d.data.count})
                   .attr('dx', function(d){return barWidth - ((d.data.count.length - 1)*7) - 13 - d.depth * margin.left})
-
         }
 
 
@@ -810,17 +768,10 @@
                     .attr("border", 0)
                     .style("stroke","white")
                     .style("stroke-opacity", 0.6)
-                    // .style("fill","#ff0571")
                     .style("fill", function(d) {
                         if (d.data.name){
                             if (i in d.data.sources){
                                 return oneBlack
-                                // var non_nulls = Object.values(d.data.sources[i]).filter(key=>d.data.dist[key]!=null).length
-                                // if (non_nulls > 0){
-                                //     return oneBlack
-                                // }else{
-                                //     return nullGray
-                                // }
                             }else{
                                 return zeroGray
                             }
@@ -841,23 +792,6 @@
                                 tooltip.style("background-color",colorScale(d.data.sources[i]))
                                 tooltip.style("color", "#1e1e1e")
                             }
-
-                            // if (d.data.name){
-                            //     var st = "<a style=\"text-decoration: underline\">MAG ID --- Distance</a><br/>"
-                            //     var used = false
-                            //     d.data.sources[i].forEach((key) => {
-                            //         if (d.data.dist[key] != null){
-                            //             st = st + key + " : " + d.data.dist[key] + "<br/>"
-                            //             used = true
-                            //         }else{
-                            //             st+= "<a style=\"color:#828282;\">" + key + " : " + d.data._dist[key] + "</a>" + "<br/>"
-                            //         }
-                            //
-                            //     })
-                            //     if (used){
-                            //         tooltip.html(st)
-                            //     }
-                            // }else{
                             tooltip.text(d.data.sources[i].toString())
                                 // we want to also update the rect color here
                             // }
@@ -883,13 +817,6 @@
                             }
                         }
                     });
-                    // .on("click", function(d){
-                    //         if (i in d.data.sources){
-                    //             if (!d.data.bar_filter){
-                    //                 show_tree_table(d, i)
-                    //             }
-                    //         }
-                    // });
               }
           }
           // +++++++++++++++++++++++++++++++++++++++++++++++++
@@ -903,11 +830,8 @@
               .attr("height", barHeight)
               .attr("width", leaf_width)
               .attr("border", 0)
-              //.style('stroke', "#7ab9ff")
               .style("fill", color)
               .on("click", click)
-              // .append("svg:title")
-              // .text("Distance")
               .on("mouseover", show_dist_text)
               .on("mousemove", function(d){ return tooltip.style("top", (event.pageY - 30) + "px").style("left", (event.pageX) + "px")})
               .on("mouseout", function(d){return tooltip.style("top", "-9999px");})
@@ -1051,10 +975,6 @@
             return 0
           }
         }
-
-        // function stroke_color(d){
-        //   return d._children ? "#3182bd" : d.children ? "#3182bd" : "#7ab9ff";
-        // }
 
         function color(d) {
           return d._children ? "#badaff" : d.children ? "#badaff" : "#7ab9ff";

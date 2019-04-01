@@ -76,13 +76,13 @@ class kb_cmash:
         filtered_results = {}
         for upa in results:
             if len(results[upa]) < 1:
-                pass
+                continue
             else:
                 filtered_results[upa] = results[upa]
         if len(filtered_results) < 1:
             html_path = os.path.join(self.shared_folder, "index.html")
             with open(html_path, 'w') as f:
-                f.write("<h3>No inputs have matched with any metagenomes in databse: %s</h3>"%db)
+                f.write("<h3>No inputs have matched with any metagenomes in databse %s</h3>"%params.get('db'))
         else:
             html_path = cmu.output_to_html(filtered_results, 'index.html')
         output = cmu.get_report(html_path)

@@ -5,6 +5,7 @@ import math
 import uuid
 import pandas as pd
 from jinja2 import Environment, PackageLoader, select_autoescape
+import pprint
 
 from installed_clients.KBaseReportClient import KBaseReport
 from .ui_utils import format_results
@@ -13,6 +14,8 @@ env = Environment(
     loader=PackageLoader('kb_cmash','utils/templates'),
     autoescape=select_autoescape(['html'])
 )
+
+pp = pprint.PrettyPrinter(indent=4)
 
 class CMashUtils():
     '''
@@ -122,28 +125,43 @@ class CMashUtils():
         '''
         html_path = os.path.join(self.shared_folder, html_file)
         stats, upa_names, tree, markers = format_results(self.workspace_url, self.callback_url, results)
+
+        # print("="*80)
+        # print("STATS",stats)
+        # print("TREE")
+        # pp.pprint(tree)
+        # print("UPA NAMES", upa_names)
+        # print("MARKERS", markers)
+
+
+
         ranges, shortened_upa_names, number_of_points = self._get_remaining_args(stats, tree, upa_names)
+
+        # print("RANGES", ranges)
+        # print("SHORT UPA NAMES", shortened_upa_names)
+        # print("NUMBER OF POINTS", number_of_points)
+        # print("="*80)
         template = env.get_template(html_file)
 
         #[ranges, markers, sources, tree,  short_sources, number_of_points]
-        if len(upa_names) > 1:
-            rendered_html = template.render(
-                ranges=ranges,
-                markers=markers,
-                tree=tree,
-                sources=upa_names,
-                short_sources=shortened_upa_names,
-                number_of_points=number_of_points
-            )
-        else:
-            rendered_html = template.render(
-                ranges=ranges,
-                markers=markers,
-                tree=tree,
-                sources=upa_names,
-                short_sources=shortened_upa_names,
-                number_of_points=number_of_points
-            )
+        # if len(upa_names) > 1:
+        rendered_html = template.render(
+            ranges=ranges,
+            markers=markers,
+            tree=tree,
+            sources=upa_names,
+            short_sources=shortened_upa_names,
+            number_of_points=number_of_points
+        )
+        # else:
+            # rendered_html = template.render(
+            #     ranges=ranges,
+            #     markers=markers,
+            #     tree=tree,
+            #     sources=upa_names,
+            #     short_sources=shortened_upa_names,
+            #     number_of_points=number_of_points
+            # )
         with open(html_path, 'w') as f:
             f.write(rendered_html)
         return html_path

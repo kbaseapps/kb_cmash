@@ -13,7 +13,6 @@ from kb_cmash.utils.ui_utils import format_results
 
 from installed_clients.WorkspaceClient import Workspace
 
-
 class kb_cmashTest(unittest.TestCase):
 
     @classmethod
@@ -84,6 +83,18 @@ class kb_cmashTest(unittest.TestCase):
             'db':db
         })
 
+    def test_assembly_input(self):
+        """
+        """
+        ref = "23594/10/1"
+        db = "100_metagenomes_testdb.h5"
+
+        ret = self.getImpl().run_kb_cmash(self.getContext(), {
+            'workspace_name': self.getWsName(),
+            'ref': ref,
+            'n_max_results': 10,
+            'db':db
+        })
 
     def test_from_files(self):
         '''
