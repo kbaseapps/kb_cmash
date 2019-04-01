@@ -16,6 +16,7 @@ def get_statistics(df_metadata, result, dist_col="containment_index",upa_name=No
     Returns:
 
     '''
+    df_metadata.fillna("", inplace=True)
 
     df_id_col  = "assembly_id" #
     row_id_col = "assembly_id" #
