@@ -156,10 +156,10 @@
 <!-- HTML below -->
 <body style="height:100vh">
     <div style="height: 140px;">
-        <div class='tab'>
+        <div id="buttons" class='tab'>
             <button class="tablinks" onclick="openTab(event, 'stats')" id="defaultOpen">List View</button>
             <button class="tablinks" onclick="openTab(event, 'treetab')">Ecosystem Tree</button>
-            <button class="tablinks" onclick="openTab(event, 'maptab')">Map</button>
+            <!-- <button class="tablinks" onclick="openTab(event, 'maptab')">Map</button> -->
         </div>
 
         <div>
@@ -234,17 +234,36 @@
     </div>
 
 
-    <div id="maptab" class="tabcontent">
+    <!-- <div id="maptab" class="tabcontent">
         <div id="mapid" style="height: 600px; width: 800px;"></div>
-    </div>
+    </div> -->
 
     <script>
-        var tree = {{tree|safe}}
-        var sources = {{sources|safe}}
-        var short_sources = {{short_sources|safe}}
-        var number_of_points = {{number_of_points|safe}}
-    </script>
+        var tree = {{tree|safe}};
+        var sources = {{sources|safe}};
+        var short_sources = {{short_sources|safe}};
+        var number_of_points = {{number_of_points|safe}};
+        var markers = {{ markers|safe }};
 
+        if (markers.length > 0){
+            var mapButton, mapTab, mapID;
+            mapTab = document.createElement('div');
+            mapTab.className = "tabcontent";
+            mapTab.id = "maptab";
+            mapID = document.createElement('div');
+            mapID.id = "mapid";
+            mapID.style = "height: 750px; width:1000px"
+            mapTab.appendChild(mapID)
+            document.body.appendChild(mapTab)
+
+            mapButton = document.createElement('button');
+            mapButton.className = 'tablinks';
+            mapButton.onclick = function(){openTab(event, 'maptab');};
+            mapButton.innerHTML = "Map";
+            document.getElementById('buttons').appendChild(mapButton)
+        }
+
+    </script>
 
     <script>
         var dist_range;
@@ -308,41 +327,40 @@
 
     <script>
 
-        let markers={{ markers|safe }};
-
-        let avg_lat = 0.0;
-        let avg_lng = 0.0;
-        for (i=0; i < markers.length; i++){
-            avg_lat = avg_lat + markers[i].lat
-            avg_lng = avg_lng + markers[i].lng
-        }
-        avg_lat = avg_lat/markers.length
-        avg_lng = avg_lng/markers.length
-
-        console.log(avg_lat)
-        console.log(avg_lng)
-
-        var mymap = new L.map("mapid").setView([avg_lat, avg_lng],2);
-
-        // create the tile layer with correct attribution
-        let osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-        let osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
-        let osm = new L.TileLayer(osmUrl, {attribution: osmAttrib}).addTo(mymap);
-
-        for (i=0;i<markers.length;i++) {
-            let map_pop_up_text;
-            map_pop_up_text = "<h3>"+markers[i].name+"</h3><p>"
-            if (sources.length > 1){
-                map_pop_up_text = map_pop_up_text + "Inputs:</p><p>"
-                for (j = 0; j < markers[i].inputs; j++){
-                    map_pop_up_text = map_pop_up_text + markers[i].inputs[j] + "</p><p>"
-                }
+        if (markers.length > 0){
+            let avg_lat = 0.0;
+            let avg_lng = 0.0;
+            for (i=0; i < markers.length; i++){
+                avg_lat = avg_lat + markers[i].lat
+                avg_lng = avg_lng + markers[i].lng
             }
-            map_pop_up_text = map_pop_up_text + markers[i].details+"</p>"
+            avg_lat = avg_lat/markers.length
+            avg_lng = avg_lng/markers.length
 
-            let marker = new L.marker([markers[i].lat, markers[i].lng]).addTo(mymap).bindPopup(map_pop_up_text);
+            console.log(avg_lat)
+            console.log(avg_lng)
+
+            var mymap = new L.map("mapid").setView([avg_lat, avg_lng],2);
+
+            // create the tile layer with correct attribution
+            let osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+            let osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
+            let osm = new L.TileLayer(osmUrl, {attribution: osmAttrib}).addTo(mymap);
+
+            for (i=0;i<markers.length;i++) {
+                let map_pop_up_text;
+                map_pop_up_text = "<h3>"+markers[i].name+"</h3><p>"
+                if (sources.length > 1){
+                    map_pop_up_text = map_pop_up_text + "Inputs:</p><p>"
+                    for (j = 0; j < markers[i].inputs; j++){
+                        map_pop_up_text = map_pop_up_text + markers[i].inputs[j] + "</p><p>"
+                    }
+                }
+                map_pop_up_text = map_pop_up_text + markers[i].details+"</p>"
+
+                let marker = new L.marker([markers[i].lat, markers[i].lng]).addTo(mymap).bindPopup(map_pop_up_text);
+            }
         }
-
     </script>
 
     <script>
@@ -370,7 +388,7 @@
         }else{
             treeDiv = document.createElement('div');
             treeDiv.id = 'treeid';
-            document.getElementById('tree_group').append(treeDiv)
+            document.getElementById('tree_group').appendChild(treeDiv)
         }
 
         var margin = {top: 30, right: 20, bottom: 30, left: 20},
@@ -379,7 +397,7 @@
             map_window_width = Math.min(map_width, 600),
             tree_map_gap = 20,
             title_height = 150,
-            lwidth = 50;
+            lwidth = 60;
 
         var min_tree_width = 300;
 
@@ -965,17 +983,16 @@
             for (i = 0; i < tablinks.length; i++) {
                 tablinks[i].className = tablinks[i].className.replace(" active", "");
             }
-            console.log(name)
 
             // Show the current tab, and add an "active" class to the button that opened the tab
             document.getElementById(name).style.display = "block";
             evt.currentTarget.className += " active";
 
-            if (name == "maptab"){
-                console.log("i get in here")
-                mymap.invalidateSize()
+            if (markers.length > 0){
+                if (name == "maptab"){
+                    mymap.invalidateSize()
+                }
             }
-
         }
         document.getElementById("defaultOpen").click();
     </script>

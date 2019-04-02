@@ -85,6 +85,7 @@ class CMashUtils():
                 output_df.loc[idx,'mgy_id'] = mgy_id
 
             output_df.loc[:,'dist'] = output_df['containment_index']
+            output_df.fillna("", inplace=True)
 
             records = output_df.to_dict('records')
             return records
@@ -125,22 +126,8 @@ class CMashUtils():
         '''
         html_path = os.path.join(self.shared_folder, html_file)
         stats, upa_names, tree, markers = format_results(self.workspace_url, self.callback_url, results)
-
-        # print("="*80)
-        # print("STATS",stats)
-        # print("TREE")
-        # pp.pprint(tree)
-        # print("UPA NAMES", upa_names)
-        # print("MARKERS", markers)
-
-
-
         ranges, shortened_upa_names, number_of_points = self._get_remaining_args(stats, tree, upa_names)
 
-        # print("RANGES", ranges)
-        # print("SHORT UPA NAMES", shortened_upa_names)
-        # print("NUMBER OF POINTS", number_of_points)
-        # print("="*80)
         template = env.get_template(html_file)
 
         #[ranges, markers, sources, tree,  short_sources, number_of_points]

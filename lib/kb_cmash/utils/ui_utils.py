@@ -35,7 +35,7 @@ def get_statistics(df_metadata, result, dist_col="containment_index",upa_name=No
         for col in columns:
             curr[col.strip().lower().replace(' ','_').replace('-', '_')] = df_row.loc[0, col]
 
-        dist_dict[df_row.loc[0,'assembly_id']] = row[dist_col]
+        dist_dict[df_row.loc[0,'assembly_id']] = round(row[dist_col], 3)
 
         stats.append(curr)
 
@@ -111,15 +111,19 @@ def get_locations(stats, markers, upa_name):
         if id_ in markers:
             markers[id_]['inputs'].append(upa_name)
         else:
-            markers[id_] = {
-                'name': s['sample_name'],
-                'lat': s['latitude'],
-                'lng': s['longitude'],
-                'details': "Collection date: %s <br>Analysis completed: %s <br>Geo-location: %s"%(
-                        s["collection_date"], s["analysis_completed"], s["geo_loc_name"]
-                ),
-                'inputs': [upa_name]
-            }
+            # Must have a physical location to go on map
+            # so here we filter for latitude and longitude variables
+            if not pd.isnull(s['latitude']) and not pd.isnull(s['longitude']) \
+                and s['latitude'] != "" and s['longitude'] != "":
+                markers[id_] = {
+                    'name': s['sample_name'],
+                    'lat': s['latitude'],
+                    'lng': s['longitude'],
+                    'details': "Collection date: %s <br>Analysis completed: %s <br>Geo-location: %s"%(
+                            s["collection_date"], s["analysis_completed"], s["geo_loc_name"]
+                    ),
+                    'inputs': [upa_name]
+                }
     return markers
 
 def get_upa_name(ws_url, cb_url, upa, is_test):
@@ -201,12 +205,8 @@ def format_results(ws_url, cb_url, results, is_test=False):
 
     df_metadata = df_metadata.fillna({col:"Unknown" for col in tree_cols})
 
-    upas, upa_names, stats, markers = [], [], [], {}
-    all_df = []
+    upas, upa_names, stats, all_df, markers, dist_dict = [], [], [], [], {}, {}
     # biosample,sample-alias,sample-desc,biome_id,sample_id,assembly_id,study-name
-
-    dist_dict = {}
-
     id_col = "assembly_id" # put in the ID column
     df_id_col = "assembly_id" #Id columns for dataframe
 
