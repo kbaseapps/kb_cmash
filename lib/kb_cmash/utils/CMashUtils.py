@@ -133,6 +133,7 @@ class CMashUtils():
         #[ranges, markers, sources, tree,  short_sources, number_of_points]
         # if len(upa_names) > 1:
         rendered_html = template.render(
+            stats=stats,
             ranges=ranges,
             markers=markers,
             tree=tree,

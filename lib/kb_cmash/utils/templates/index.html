@@ -867,7 +867,17 @@
               .style("font-family","monospace")
               .attr('dx', function(d){return barWidth - ((d.data.count.length - 1)*7) - 13 - d.depth * margin.left})
               .style("fill", "#9b9b9b")
-              .text(function(d) {return d.data.count})
+              .text(function(d) {
+                  if (sources.length > 1){
+                      return d.data.count
+                  }else{
+                      if (d.data.name){
+                          return ""
+                      }else{
+                          return d.data.count
+                      }
+                  }
+              })
           // ------------------------------------------------------------------------
 
           // Transition nodes to their new position.
