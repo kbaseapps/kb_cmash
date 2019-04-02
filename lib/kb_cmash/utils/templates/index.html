@@ -691,7 +691,12 @@
           // Compute the flattened node list.
           var nodes = root.descendants().filter(bar_filtration);
 
-          var height = Math.max(50, (nodes.length * barHeight) + margin.top + margin.bottom + tree_map_gap +title_height);
+          if (sources.length > 1){
+              var height = Math.max(50, (nodes.length * barHeight) + margin.top + margin.bottom + tree_map_gap +title_height);
+          }else{
+              var height = Math.max(50, (nodes.length * barHeight) + margin.top + margin.bottom);
+          }
+          // var height = Math.max(50, (nodes.length * barHeight) + margin.top + margin.bottom + tree_map_gap +title_height);
 
           d3.select("svg").transition()
               .duration(duration)

@@ -63,10 +63,10 @@ class kb_cmash:
             db  = os.path.join(curr_dir, "utils/data", params.get('db'))
         else:
             raise ValueError("must provide reference database")
-        if params.get("n_max_results"):
-            n_max_results = params.get('n_max_results')
-        else:
-            raise ValueError("Must provide n_max_results")
+        # if params.get("n_max_results"):
+        #     n_max_results = params.get('n_max_results')
+        # else:
+        #     raise ValueError("Must provide n_max_results")
 
         # get fasta file from input reference
         fasta_paths = load_fastas(self.callback_url, self.shared_folder, ref)

@@ -34,20 +34,6 @@
                     "display": "100 metagenomes (test)"
                 }]
             }
-        },
-        {
-            "id": "n_max_results",
-            "optional": false,
-            "advanced": false,
-            "allow_multiple": false,
-            "default_values": [10],
-            "field_type": "text",
-            "text_options": {
-                "valid_ws_types":[],
-                "validate_as":"int",
-                "min_int":1,
-                "max_int":500
-            }
         }
     ],
     "behavior": {
@@ -69,9 +55,6 @@
                 },{
                     "input_parameter": "db",
                     "target_property": "db"
-                },{
-                    "input_parameter": "n_max_results",
-                    "target_property": "n_max_results"
                 }
             ],
             "output_mapping": [
