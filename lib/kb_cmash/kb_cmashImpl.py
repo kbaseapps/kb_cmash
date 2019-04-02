@@ -86,9 +86,9 @@ class kb_cmash:
                 f.write("<body style=\"height:100vh\"><h3 style=\"height: 40px\">No inputs have matched with any metagenomes in databse %s</h3></body>"%params.get('db'))
         else:
             if len(filtered_results) > n_max_results:
-                keep_upas = sorted(filtered_results.items(), key=lambda(k,v): v['dist'])
+                keep_upas = sorted(filtered_results.items(), key=lambda k,v: v['dist'])
                 keep_upas = [k[0] for k in keep_upas][:n_max_results]
-                filtered_results = [key:filtered_results[key] for key in keep_upas]
+                filtered_results = {key:filtered_results[key] for key in keep_upas}
 
             html_path = cmu.output_to_html(filtered_results, 'index.html')
 
