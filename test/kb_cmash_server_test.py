@@ -79,6 +79,7 @@ class kb_cmashTest(unittest.TestCase):
         ret = self.getImpl().run_kb_cmash(self.getContext(), {
             'workspace_name': self.getWsName(),
             'ref': gs_ref,
+            'n_max_results': 10,
             'db':db
         })
 
@@ -91,6 +92,7 @@ class kb_cmashTest(unittest.TestCase):
         ret = self.getImpl().run_kb_cmash(self.getContext(), {
             'workspace_name': self.getWsName(),
             'ref': ref,
+            'n_max_results': 10,
             'db':db
         })
 
@@ -122,5 +124,6 @@ class kb_cmashTest(unittest.TestCase):
         ret = self.getImpl().run_kb_cmash(self.getContext(), {
             'workspace_name': self.getWsName(),
             'ref': ref,
+            'n_max_results': 10,
             'db':db
         })
