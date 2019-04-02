@@ -82,7 +82,8 @@ class kb_cmash:
         if len(filtered_results) < 1:
             html_path = os.path.join(self.shared_folder, "index.html")
             with open(html_path, 'w') as f:
-                f.write("<h3>No inputs have matched with any metagenomes in databse %s</h3>"%params.get('db'))
+                # f.write("<script>window.parent.document.getElementById().height = \"\";</script>")
+                f.write("<body style=\"height:100vh\"><h3 style=\"height: 40px\">No inputs have matched with any metagenomes in databse %s</h3></body>"%params.get('db'))
         else:
             html_path = cmu.output_to_html(filtered_results, 'index.html')
         output = cmu.get_report(html_path)
