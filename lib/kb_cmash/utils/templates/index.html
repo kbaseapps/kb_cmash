@@ -395,9 +395,15 @@
             barHeight = 25,
             map_width = (sources.length + 1) * barHeight,
             map_window_width = Math.min(map_width, 600),
-            tree_map_gap = 20,
-            title_height = 150,
             lwidth = 60;
+
+        if (sources.length > 1){
+            var title_height = 150;
+            var tree_map_gap = 20;
+        }else{
+            var title_height = 0;
+            var tree_map_gap = 0;
+        }
 
         var min_tree_width = 300;
 
@@ -691,11 +697,7 @@
           // Compute the flattened node list.
           var nodes = root.descendants().filter(bar_filtration);
 
-          if (sources.length > 1){
-              var height = Math.max(50, (nodes.length * barHeight) + margin.top + margin.bottom + tree_map_gap +title_height);
-          }else{
-              var height = Math.max(50, (nodes.length * barHeight) + margin.top + margin.bottom);
-          }
+          var height = Math.max(50, (nodes.length * barHeight) + margin.top + margin.bottom + tree_map_gap + title_height);
           // var height = Math.max(50, (nodes.length * barHeight) + margin.top + margin.bottom + tree_map_gap +title_height);
 
           d3.select("svg").transition()

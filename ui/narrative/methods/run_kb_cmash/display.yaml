@@ -39,13 +39,13 @@ parameters :
         long-hint  : |
             database to reference against
 
-    # n_max_results:
-    #     ui-name: |
-    #         Maximum number of results
-    #     short-hint: |
-    #         Maximum number of similar sequence results to return, limit 500
-    #     long-hint: |
-    #         Maximum number of similar sequence results to return, limit 500
+    n_max_results:
+        ui-name: |
+            Maximum number of results
+        short-hint: |
+            Maximum number of similar sequence results to return, limit 500
+        long-hint: |
+            Maximum number of similar sequence results to return, limit 500
 
 description : |
     CMash is a fast and accurate way to estimate the similarity of two sets. This is a probabilisitic data analysis approach, and uses containment min hashing.

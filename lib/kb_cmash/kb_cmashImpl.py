@@ -63,10 +63,10 @@ class kb_cmash:
             db  = os.path.join(curr_dir, "utils/data", params.get('db'))
         else:
             raise ValueError("must provide reference database")
-        # if params.get("n_max_results"):
-        #     n_max_results = params.get('n_max_results')
-        # else:
-        #     raise ValueError("Must provide n_max_results")
+        if params.get("n_max_results"):
+            n_max_results = params.get('n_max_results')
+        else:
+            raise ValueError("Must provide n_max_results")
 
         # get fasta file from input reference
         fasta_paths = load_fastas(self.callback_url, self.shared_folder, ref)
@@ -85,7 +85,13 @@ class kb_cmash:
                 # f.write("<script>window.parent.document.getElementById().height = \"\";</script>")
                 f.write("<body style=\"height:100vh\"><h3 style=\"height: 40px\">No inputs have matched with any metagenomes in databse %s</h3></body>"%params.get('db'))
         else:
+            if len(filtered_results) > n_max_results:
+                keep_upas = sorted(filtered_results.items(), key=lambda(k,v): v['dist'])
+                keep_upas = [k[0] for k in keep_upas][:n_max_results]
+                filtered_results = [key:filtered_results[key] for key in keep_upas]
+
             html_path = cmu.output_to_html(filtered_results, 'index.html')
+
         output = cmu.get_report(html_path)
         #END run_kb_cmash
 
@@ -104,3 +110,4 @@ class kb_cmash:
                      'git_commit_hash': self.GIT_COMMIT_HASH}
         #END_STATUS
         return [returnVal]
+ds

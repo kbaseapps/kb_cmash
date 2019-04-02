@@ -99,9 +99,9 @@ class CMashUtils():
         '''
         minimum_step = 0.001
         num_steps = 100
-        min_dist   = math.floor(100*min([s['dist'] for s in stats]))/100.0
-        max_dist   = math.ceil(100*max([s['dist'] for s in stats]))/100.0
-        step_dist  = max( round((max_dist-min_dist)/num_steps, 3), minimum_step)
+        min_dist  = math.floor(100*min([s['dist'] for s in stats]))/100.0
+        max_dist  = math.ceil(100*max([s['dist'] for s in stats]))/100.0
+        step_dist = max( round((max_dist-min_dist)/num_steps, 3), minimum_step)
 
         ranges = [min_dist, max_dist, step_dist]
 
@@ -131,7 +131,6 @@ class CMashUtils():
         template = env.get_template(html_file)
 
         #[ranges, markers, sources, tree,  short_sources, number_of_points]
-        # if len(upa_names) > 1:
         rendered_html = template.render(
             stats=stats,
             ranges=ranges,
@@ -141,15 +140,6 @@ class CMashUtils():
             short_sources=shortened_upa_names,
             number_of_points=number_of_points
         )
-        # else:
-            # rendered_html = template.render(
-            #     ranges=ranges,
-            #     markers=markers,
-            #     tree=tree,
-            #     sources=upa_names,
-            #     short_sources=shortened_upa_names,
-            #     number_of_points=number_of_points
-            # )
         with open(html_path, 'w') as f:
             f.write(rendered_html)
         return html_path

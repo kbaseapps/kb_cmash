@@ -55,6 +55,9 @@
                 },{
                     "input_parameter": "db",
                     "target_property": "db"
+                },{
+                    "input_parameter": "n_max_results",
+                    "target_property": "n_max_results"
                 }
             ],
             "output_mapping": [
