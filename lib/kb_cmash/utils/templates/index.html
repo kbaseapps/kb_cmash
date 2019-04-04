@@ -181,9 +181,9 @@
 
     going to replace this tree thing with html
     -->
-    <div id='stats' class="tabcontent">
+    <div id="stats" class="tabcontent" style="width: 98%;">
 
-        <table id='stats_table' style="width:98%;" class='table table-striped table-bordered'>
+        <table id='stats_table' class='table table-striped table-bordered'>
             <thead>
                 <tr>
                     <td>Input Name</td>
@@ -250,6 +250,7 @@
             mapTab = document.createElement('div');
             mapTab.className = "tabcontent";
             mapTab.id = "maptab";
+            mapTab.style = "height: 780px; width: 98%;"
             mapID = document.createElement('div');
             mapID.id = "mapid";
             mapID.style = "height: 750px; width:1000px"
@@ -303,6 +304,8 @@
                 },
                 stop: function( event, ui ) {
                     table.draw();
+                    let t_height = document.getElementById("stats_table_wrapper").style.height + 30
+                    document.getElementById("stats").style.height = t_height.toString() + "px"
                     min_dist_value = ui.values[0]
                     max_dist_value = ui.values[1]
                     update_root(root, min_dist_value, max_dist_value, false)
@@ -323,6 +326,7 @@
                 'bFilter': true
             });
         });
+
     </script>
 
     <script>
@@ -336,9 +340,6 @@
             }
             avg_lat = avg_lat/markers.length
             avg_lng = avg_lng/markers.length
-
-            console.log(avg_lat)
-            console.log(avg_lng)
 
             var mymap = new L.map("mapid").setView([avg_lat, avg_lng],2);
 
@@ -709,6 +710,7 @@
                 .attr("height", height);
           }
           document.getElementById("treeid").style.height = height.toString() + "px"
+          document.getElementById("treetab").style.height = height.toString() + "px"
           if (sources.length > 1){
               document.getElementById("treemap").style.height = height.toString() + "px"
               document.getElementById("treegroup").style.height = height.toString() + "px"
