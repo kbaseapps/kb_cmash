@@ -1,2 +1,8 @@
 test_local
 sdk.cfg
+.DS_Store
+edit_csv.py
+ebi_samples_metadata.csv
+ebi_samples_metadata_with_cols.csv
+ebi_samples_metadata_with_studies_final.csv
+RefSeqSketches.msh
