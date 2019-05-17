@@ -83,7 +83,7 @@ class kb_cmash:
             html_path = os.path.join(self.shared_folder, "index.html")
             with open(html_path, 'w') as f:
                 # f.write("<script>window.parent.document.getElementById().height = \"\";</script>")
-                f.write("<body style=\"height:40px\"><h3 style=\"height: 40px\">No inputs have matched with any metagenomes in databse %s</h3></body>"%params.get('db'))
+                f.write("<body style=\"height:40px\"><h3 style=\"height: 40px\">No inputs have matched with any metagenomes in database %s</h3></body>"%params.get('db'))
         else:
             if len(filtered_results) > n_max_results:
                 keep_upas = sorted(filtered_results.items(), key=lambda k,v: v['dist'])
