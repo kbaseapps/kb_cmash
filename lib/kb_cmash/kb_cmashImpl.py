@@ -53,14 +53,15 @@ class kb_cmash:
         # ctx is the context object
         # return variables are: output
         #BEGIN run_kb_cmash
-        curr_dir =  os.path.dirname(os.path.realpath(__file__))
-
         if params.get('ref'):
             ref = params.get('ref')
         else:
             raise ValueError("must provide ws reference")
         if params.get('db'):
-            db  = os.path.join(curr_dir, "utils/data", params.get('db'))
+            db = params.get('db')
+            # verify db is file
+            if not os.path.isfile(db):
+                raise ValueError(f"db path {db} not valid.")
         else:
             raise ValueError("must provide reference database")
         if params.get("n_max_results"):
@@ -110,4 +111,4 @@ class kb_cmash:
                      'git_commit_hash': self.GIT_COMMIT_HASH}
         #END_STATUS
         return [returnVal]
-ds
+

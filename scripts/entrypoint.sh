@@ -17,6 +17,14 @@ elif [ "${1}" = "async" ] ; then
   sh ./scripts/run_async.sh
 elif [ "${1}" = "init" ] ; then
   echo "Initialize module"
+  echo "Downloading databases..."
+  cd /data
+  curl -O ftp://ftp.kbase.us/assets/CMash_db_size8945.h5
+  if [[ -f "CMash_db_size8945.h5" ]] ; then
+    touch __READY__
+  else
+    echo "init failed"
+  fi
 elif [ "${1}" = "bash" ] ; then
   bash
 elif [ "${1}" = "report" ] ; then

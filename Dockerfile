@@ -23,6 +23,7 @@ RUN apt-get -y update &&\
 
 # -----------------------------------------
 
+COPY /data /data
 COPY ./ /kb/module
 RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module

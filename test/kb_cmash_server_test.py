@@ -13,6 +13,9 @@ from kb_cmash.utils.ui_utils import format_results
 
 from installed_clients.WorkspaceClient import Workspace
 
+SMALL_DB = "/kb/module/lib/kb_cmash/utils/data/100_metagenomes_testdb.h5"
+BIG_DB = "/data/CMash_db_size8945.h5"
+
 class kb_cmashTest(unittest.TestCase):
 
     @classmethod
@@ -74,26 +77,24 @@ class kb_cmashTest(unittest.TestCase):
         test genome set as input
         """
         gs_ref = "23594/20/1"
-        db = "100_metagenomes_testdb.h5"
 
         ret = self.getImpl().run_kb_cmash(self.getContext(), {
             'workspace_name': self.getWsName(),
             'ref': gs_ref,
             'n_max_results': 10,
-            'db':db
+            'db': SMALL_DB
         })
 
     def test_assembly_input(self):
         """
         """
         ref = "23594/10/1"
-        db = "100_metagenomes_testdb.h5"
 
         ret = self.getImpl().run_kb_cmash(self.getContext(), {
             'workspace_name': self.getWsName(),
             'ref': ref,
             'n_max_results': 10,
-            'db':db
+            'db': SMALL_DB
         })
 
     def test_from_files(self):
@@ -101,14 +102,26 @@ class kb_cmashTest(unittest.TestCase):
         test on local file
         '''
         fasta_path = "data/MGYA00237725_ERZ505430_FASTA.fa"
-        db = "data/100_metagenomes_testdb.h5"
 
         cmu = CMashUtils(self.__class__.cfg, self.wsURL, self.callback_url)
-        results = cmu.query_db(db, [(fasta_path, '0/0/0')])
+        results = cmu.query_db(SMALL_DB, [(fasta_path, '0/0/0')])
         stats, upa_names, tree, markers = format_results(self.wsURL, self.callback_url, results, is_test=True)
 
+    def test_bigger_db(self):
+        """
+        test against bigger database
+        """
+        ref = "22385/47/1"
+
+        ret = self.getImpl().run_kb_cmash(self.getContext(), {
+            'workspace_name': self.getWsName(),
+            'ref': ref,
+            'n_max_results': 10,
+            'db': BIG_DB
+        })
+
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
-    def test_your_method(self):
+    def test_small_db(self):
         # Prepare test objects in workspace if needed using
         # self.getWsClient().save_objects({'workspace': self.getWsName(),
         #                                  'objects': []})
@@ -119,11 +132,10 @@ class kb_cmashTest(unittest.TestCase):
         # Check returned data with
         # self.assertEqual(ret[...], ...) or other unittest methods
         ref = "22385/47/1"
-        db = "100_metagenomes_testdb.h5"
 
         ret = self.getImpl().run_kb_cmash(self.getContext(), {
             'workspace_name': self.getWsName(),
             'ref': ref,
             'n_max_results': 10,
-            'db':db
+            'db': SMALL_DB
         })

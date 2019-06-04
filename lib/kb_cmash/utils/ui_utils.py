@@ -7,11 +7,12 @@ from scipy.cluster.hierarchy import linkage, leaves_list
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.WorkspaceClient import Workspace
 
-def get_statistics(df_metadata, result, dist_col="containment_index",upa_name=None):
+def get_statistics(df_metadata, result, wgs_dict, dist_col="containment_index",upa_name=None):
     '''
     Inputs:
         - df_metadata:
         - result:
+        - wgs_dict: 
         - upa_name (optional):
     Returns:
 
@@ -23,17 +24,31 @@ def get_statistics(df_metadata, result, dist_col="containment_index",upa_name=No
     columns = df_metadata.columns
     stats = []
     dist_dict = {}
-    for row in result:
+    # print('-'*80)
+    # print('-'*80)
+    # print('-'*80)
+    # print(json.dumps(result))
+    # print('-'*80)
+    # print('-'*80)
+    # print('-'*80)
+    for row_i, row in enumerate(result):
         curr = {}
 
-        df_row = df_metadata[df_metadata[df_id_col] == row[row_id_col]]
+        row_id = row[row_id_col]
+        if row_id in wgs_dict:
+            row_id = wgs_dict[row_id]
+
+        df_row = df_metadata[df_metadata[df_id_col] == row_id]
         df_row = df_row.reset_index()
         if len(df_row) > 1:
             raise ValueError("should only have 1 assembly id row in the dataframe.")
         for key, value in row.items():
             curr[key.strip().lower().replace(' ','_').replace('-', '_')] = value
         for col in columns:
-            curr[col.strip().lower().replace(' ','_').replace('-', '_')] = df_row.loc[0, col]
+            try:
+                curr[col.strip().lower().replace(' ','_').replace('-', '_')] = df_row.loc[0, col]
+            except KeyError as err:
+                raise ValueError(f"on iter {row_i} could not get col {col} from {df_row}. \nrow = {row}....\n row_id = {row[row_id_col]}")
 
         dist_dict[df_row.loc[0,'assembly_id']] = round(row[dist_col], 3)
 
@@ -203,6 +218,10 @@ def format_results(ws_url, cb_url, results, is_test=False):
     df_metadata = pd.read_csv(metadata_path)
     tree_cols = ["category_"+str(i) for i in range(1,6)] + ["assembly_id"]
 
+    wgs_to_assembly_id_path = os.path.join(curr_dir, 'data', 'wgs_accession_to_assembly_id_accession.json')
+    with open(wgs_to_assembly_id_path) as fd:
+        wgs_dict = json.load(fd)
+
     df_metadata = df_metadata.fillna({col:"Unknown" for col in tree_cols})
 
     upas, upa_names, stats, all_df, markers, dist_dict = [], [], [], [], {}, {}
@@ -214,7 +233,7 @@ def format_results(ws_url, cb_url, results, is_test=False):
         upa_name = get_upa_name(ws_url, cb_url, upa, is_test)
         upa_names.append(upa_name)
         upas.append(upa)
-        curr_stats, curr_dist_dict = get_statistics(df_metadata, result, upa_name=upa_name)
+        curr_stats, curr_dist_dict = get_statistics(df_metadata, result, wgs_dict, upa_name=upa_name)
         markers = get_locations(curr_stats, markers, upa_name)
         stats+=curr_stats
         for key, val in curr_dist_dict.items():

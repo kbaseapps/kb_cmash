@@ -13,3 +13,5 @@ module-version:
 owners:
     [slebras, psdehal]
 
+data-version:
+    0.1
