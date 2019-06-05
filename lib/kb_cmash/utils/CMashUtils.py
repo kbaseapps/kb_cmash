@@ -73,6 +73,7 @@ class CMashUtils():
             output_df = pd.read_csv(output_csv)
             columns = list(output_df.columns)
             columns[0] = "file_path"
+            # rename columns to make them easier to use
             columns = {output_df.columns[i]:columns[i].lower().strip().replace(" ", "_") for i in range(len(columns))}
             output_df.rename(columns=columns, inplace=True)
             output_df['assembly_id'] = None
@@ -101,7 +102,7 @@ class CMashUtils():
         num_steps = 100
         min_dist  = math.floor(100*min([s['dist'] for s in stats]))/100.0
         max_dist  = math.ceil(100*max([s['dist'] for s in stats]))/100.0
-        step_dist = max( round((max_dist-min_dist)/num_steps, 3), minimum_step)
+        step_dist = max(round((max_dist-min_dist)/num_steps, 3), minimum_step)
 
         ranges = [min_dist, max_dist, step_dist]
 

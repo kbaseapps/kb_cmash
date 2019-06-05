@@ -28,6 +28,7 @@ def get_statistics(df_metadata, result, wgs_dict, dist_col="containment_index",u
         curr = {}
 
         row_id = row[row_id_col]
+        # if the id for the row is in the "wgs_accession" namespace, we map it to the "assembly_id" in wgs_dict
         if row_id in wgs_dict:
             row_id = wgs_dict[row_id]
 
@@ -164,6 +165,7 @@ def remap_sources(sources, upa_order):
         val = sources[i]
         if val !=0 and val != []:
             new_sources[j] = val
+    return new_sources
 
 
 def rewind_tree(tree, upa_order):

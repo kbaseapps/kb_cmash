@@ -2,6 +2,7 @@
 #BEGIN_HEADER
 import os
 import subprocess
+import collections
 from installed_clients.KBaseReportClient import KBaseReport
 from .utils.CMashUtils import CMashUtils
 from .utils.misc_utils import load_fastas
@@ -76,9 +77,7 @@ class kb_cmash:
         results = cmu.query_db(db, fasta_paths)
         filtered_results = {}
         for upa in results:
-            if len(results[upa]) < 1:
-                continue
-            else:
+            if len(results[upa]) > 0:
                 filtered_results[upa] = results[upa]
         if len(filtered_results) < 1:
             html_path = os.path.join(self.shared_folder, "index.html")
@@ -86,10 +85,18 @@ class kb_cmash:
                 # f.write("<script>window.parent.document.getElementById().height = \"\";</script>")
                 f.write("<body style=\"height:40px\"><h3 style=\"height: 40px\">No inputs have matched with any metagenomes in database %s</h3></body>"%params.get('db'))
         else:
-            if len(filtered_results) > n_max_results:
-                keep_upas = sorted(filtered_results.items(), key=lambda k,v: v['dist'])
-                keep_upas = [k[0] for k in keep_upas][:n_max_results]
-                filtered_results = {key:filtered_results[key] for key in keep_upas}
+            if sum([len(res) for upa, res in filtered_results.items()]) > n_max_results:
+                # we want to keep the top 'n_max_results' hits.
+                # in this case we want their 'dist' field to be higher.
+                flatten = []
+                for upa, res in filtered_results.items():
+                    for hit in res:
+                        flatten.append((upa, hit))
+                flatten.sort(reverse=True, key=lambda x: x[1]['dist'])
+                flatten = flatten[:n_max_results]
+                filtered_results = collections.defaultdict(lambda: [])
+                for item in flatten:
+                    filtered_results[item[0]].append(item[1])
 
             html_path = cmu.output_to_html(filtered_results, 'index.html')
 
@@ -111,4 +118,3 @@ class kb_cmash:
                      'git_commit_hash': self.GIT_COMMIT_HASH}
         #END_STATUS
         return [returnVal]
-

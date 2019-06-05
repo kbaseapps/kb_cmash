@@ -77,7 +77,6 @@ class kb_cmashTest(unittest.TestCase):
         test genome set as input
         """
         gs_ref = "23594/20/1"
-
         ret = self.getImpl().run_kb_cmash(self.getContext(), {
             'workspace_name': self.getWsName(),
             'ref': gs_ref,
@@ -89,7 +88,6 @@ class kb_cmashTest(unittest.TestCase):
         """
         """
         ref = "23594/10/1"
-
         ret = self.getImpl().run_kb_cmash(self.getContext(), {
             'workspace_name': self.getWsName(),
             'ref': ref,
@@ -107,12 +105,22 @@ class kb_cmashTest(unittest.TestCase):
         results = cmu.query_db(SMALL_DB, [(fasta_path, '0/0/0')])
         stats, upa_names, tree, markers = format_results(self.wsURL, self.callback_url, results, is_test=True)
 
+    def test_bigger_db_with_genome_set(self):
+        """
+        """
+        gs_ref = "23594/20/1"
+        ret = self.getImpl().run_kb_cmash(self.getContext(), {
+            'workspace_name': self.getWsName(),
+            'ref': gs_ref,
+            'n_max_results': 10,
+            'db': BIG_DB
+        })
+
     def test_bigger_db(self):
         """
         test against bigger database
         """
         ref = "22385/47/1"
-
         ret = self.getImpl().run_kb_cmash(self.getContext(), {
             'workspace_name': self.getWsName(),
             'ref': ref,
