@@ -24,13 +24,6 @@ def get_statistics(df_metadata, result, wgs_dict, dist_col="containment_index",u
     columns = df_metadata.columns
     stats = []
     dist_dict = {}
-    # print('-'*80)
-    # print('-'*80)
-    # print('-'*80)
-    # print(json.dumps(result))
-    # print('-'*80)
-    # print('-'*80)
-    # print('-'*80)
     for row_i, row in enumerate(result):
         curr = {}
 
@@ -103,7 +96,7 @@ def create_tree(df, tree_cols, dist_dict, source_order=None):
             #     for upa in upas:
             #         d[d['upa']==upa][''].tolist()
             # else:
-            source_count = d[d[col]==t]['upa'].value_counts().to_dict()
+            source_count = df[df[col]==t]['upa'].value_counts().to_dict()
             for i, s in enumerate(source_order):
                 if s in source_count:
                     sources.append(source_count[s])
