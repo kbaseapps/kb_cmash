@@ -147,7 +147,6 @@
     .container {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr; /* fraction*/
-        max-width: 100vh;
     }
 
     </style>
@@ -304,8 +303,8 @@
                 },
                 stop: function( event, ui ) {
                     table.draw();
-                    let t_height = document.getElementById("stats_table_wrapper").style.height + 30
-                    document.getElementById("stats").style.height = t_height.toString() + "px"
+                    // let t_height = document.getElementById("stats_table_wrapper").style.height + 30
+                    // document.getElementById("stats").style.height = t_height.toString() + "px"
                     min_dist_value = ui.values[0]
                     max_dist_value = ui.values[1]
                     update_root(root, min_dist_value, max_dist_value, false)
