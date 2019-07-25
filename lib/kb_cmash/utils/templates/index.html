@@ -208,12 +208,12 @@
                     <td>{{item.input_name}}</td>
                     <td class="sorting_1">{{item.containment_index}}</td>
                     <td>{{item.jaccard_index}}</td>
-                    <td>{{item.assembly_id}}</td>
-                    <td>{{item.biosample}}</td>
+                    <td><a href="{{ 'https://www.ebi.ac.uk/ena/data/view/%s'%item.assembly_id }}">{{item.assembly_id}}</a></td>
+                    <td><a href="{{ 'https://www.ebi.ac.uk/ena/data/view/%s'%item.biosample }}">{{item.biosample}}</a></td>
                     <td>{{item.species}}</td>
                     <td>{{item.study_name}}</td>
                     <td>{{item.intersection}}</td>
-                    <td>{{item.sample_id}}</td>
+                    <td><a href="{{ 'https://www.ebi.ac.uk/metagenomics/api/v1/samples/%s'%item.sample_id }}">{{item.sample_id}}</a></td>
                     <td>{{item.collection_date}}</td>
                     <td>{{item.analysis_completed}}</td>
                     <td>{{item.geo_loc_name}}</td>

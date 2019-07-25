@@ -2,6 +2,7 @@
 import os
 import time
 import unittest
+import shutil
 from configparser import ConfigParser
 
 from kb_cmash.kb_cmashImpl import kb_cmash
@@ -12,6 +13,7 @@ from kb_cmash.utils.CMashUtils import CMashUtils
 from kb_cmash.utils.ui_utils import format_results
 
 from installed_clients.WorkspaceClient import Workspace
+from installed_clients.AssemblyUtilClient import AssemblyUtil
 
 SMALL_DB = "/kb/module/lib/kb_cmash/utils/data/100_metagenomes_testdb.h5"
 BIG_DB = "/data/CMash_db_size8945.h5"
@@ -130,15 +132,6 @@ class kb_cmashTest(unittest.TestCase):
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     def test_small_db(self):
-        # Prepare test objects in workspace if needed using
-        # self.getWsClient().save_objects({'workspace': self.getWsName(),
-        #                                  'objects': []})
-        #
-        # Run your method by
-        # ret = self.getImpl().your_method(self.getContext(), parameters...)
-        #
-        # Check returned data with
-        # self.assertEqual(ret[...], ...) or other unittest methods
         ref = "22385/47/1"
 
         ret = self.getImpl().run_kb_cmash(self.getContext(), {
@@ -147,3 +140,51 @@ class kb_cmashTest(unittest.TestCase):
             'n_max_results': 10,
             'db': SMALL_DB
         })
+
+    def test_au1(self):
+        """"""
+        f_name = "mid_fasta_spoof.fasta"
+        curr_dir = os.path.dirname(os.path.realpath(__file__))
+        file_path = curr_dir + "/data/" + f_name
+        new_file_path = self.scratch + "/" + f_name
+        shutil.copyfile(file_path, new_file_path)
+
+        if not os.path.isfile(new_file_path):
+            print("CANNOT FIND INPUT FILE")
+            self.assertEqual(True, False)
+        else:
+            au = AssemblyUtil(self.callback_url)
+            # au = AssemblyUtil(self.callback_url, service_ver="dev")
+            assembly_params = {
+                'file':  {
+                    'path': new_file_path,
+                    'assembly_name': "MetagenomeTestSpoofAssembly"
+                },
+                'assembly_name': "MetagenomeTestSpoofAssembly",
+                'workspace_name': self.getWsName()
+            }
+            au.save_assembly_from_fasta(assembly_params)
+
+    # def test_au2(self):
+    #     """"""
+    #     f_name = "mid_fasta_spoof.fasta"
+    #     curr_dir = os.path.dirname(os.path.realpath(__file__))
+    #     file_path = curr_dir + "/data/" + f_name
+    #     new_file_path = self.scratch + "/" + f_name
+    #     shutil.copyfile(file_path, new_file_path)
+
+    #     if not os.path.isfile(new_file_path):
+    #         print("CANNOT FIND INPUT FILE")
+    #         self.assertEqual(True, False)
+    #     else:
+    #         # au = AssemblyUtil(self.callback_url)
+    #         au = AssemblyUtil(self.callback_url, service_ver="dev")
+    #         assembly_params = {
+    #             'file':  {
+    #                 'path': new_file_path,
+    #                 'assembly_name': "MetagenomeTestSpoofAssembly"
+    #             },
+    #             'assembly_name': "MetagenomeTestSpoofAssembly",
+    #             'workspace_name': self.getWsName()
+    #         }
+    #         au.save_assembly_from_fasta(assembly_params)

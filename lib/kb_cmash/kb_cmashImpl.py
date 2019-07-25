@@ -85,18 +85,10 @@ class kb_cmash:
                 # f.write("<script>window.parent.document.getElementById().height = \"\";</script>")
                 f.write("<body style=\"height:40px\"><h3 style=\"height: 40px\">No inputs have matched with any metagenomes in database %s</h3></body>"%params.get('db'))
         else:
-            if sum([len(res) for upa, res in filtered_results.items()]) > n_max_results:
-                # we want to keep the top 'n_max_results' hits.
-                # in this case we want their 'dist' field to be higher.
-                flatten = []
-                for upa, res in filtered_results.items():
-                    for hit in res:
-                        flatten.append((upa, hit))
-                flatten.sort(reverse=True, key=lambda x: x[1]['dist'])
-                flatten = flatten[:n_max_results]
-                filtered_results = collections.defaultdict(lambda: [])
-                for item in flatten:
-                    filtered_results[item[0]].append(item[1])
+            for upa, res in filtered_results.items():
+                if len(res) > n_max_results:
+                    res.sort(reverse=True, key=lambda x: x['dist'])
+                    filtered_results[upa] = res[:n_max_results]
 
             html_path = cmu.output_to_html(filtered_results, 'index.html')
 
