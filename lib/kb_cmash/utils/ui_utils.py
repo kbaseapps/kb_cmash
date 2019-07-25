@@ -46,6 +46,9 @@ def get_statistics(df_metadata, result, wgs_dict, dist_col="containment_index",u
 
         dist_dict[df_row.loc[0,'assembly_id']] = round(row[dist_col], 3)
 
+        if upa_name:
+            curr['input_name'] = upa_name
+
         stats.append(curr)
 
     return stats, dist_dict
