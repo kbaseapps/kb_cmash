@@ -26,13 +26,10 @@
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
-            "default_values": [ "" ],
+            "default_values": [ "/data/CMash_db_size8945.h5" ],
             "field_type": "dropdown",
             "dropdown_options": {
                 "options": [{
-                    "value": "/kb/module/lib/kb_cmash/utils/data/100_metagenomes_testdb.h5",
-                    "display": "100 metagenomes (test)"
-                },{
                     "value": "/data/CMash_db_size8945.h5",
                     "display": "EBI Metagenomes (size: 8945)"
                 }]
