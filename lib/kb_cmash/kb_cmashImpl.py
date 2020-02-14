@@ -37,6 +37,8 @@ class kb_cmash:
     def __init__(self, config):
         #BEGIN_CONSTRUCTOR
         self.callback_url = os.environ['SDK_CALLBACK_URL']
+        self.config = config
+        self.config['callback_url'] = self.callback_url
         self.workspace_url = config['workspace-url']
         self.shared_folder = config['scratch']
         self.cfg = config
@@ -71,7 +73,7 @@ class kb_cmash:
             raise ValueError("Must provide n_max_results")
 
         # get fasta file from input reference
-        fasta_paths = load_fastas(self.callback_url, self.shared_folder, ref)
+        fasta_paths = load_fastas(self.cfg, self.shared_folder, ref)
         # load utils
         cmu = CMashUtils(self.cfg, self.callback_url, params['workspace_name'])
         results = cmu.query_db(db, fasta_paths)

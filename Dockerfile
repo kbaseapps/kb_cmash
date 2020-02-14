@@ -10,9 +10,11 @@ MAINTAINER KBase Developer
 # install CMash scripts
 RUN apt-get -y update &&\
 	apt-get -y upgrade &&\
+    apt-get -y install python3-setuptools &&\
 	apt-get -y install git &&\
 	apt-get -y install gcc &&\
 	apt-get -y install g++ &&\
+    apt-get -y install libcairo2-dev &&\
     cd /opt &&\
     git clone https://github.com/dkoslicki/CMash.git &&\
     cd CMash &&\
